@@ -11,11 +11,12 @@ module.exports = () => {
     openDevTools: false,
     singleLock: true,
     windowsOption: {
-      title: 'electron-egg',
+      title: 'tts-vue-next',
       width: 980,
       height: 650,
       minWidth: 400,
       minHeight: 300,
+      autoHideMenuBar: true,
       webPreferences: {
         //webSecurity: false,
         contextIsolation: false, // false -> 可在渲染进程中使用electron的api，true->需要bridge.js(contextBridge)
@@ -32,10 +33,6 @@ module.exports = () => {
       appLogName: 'ee.log',
       coreLogName: 'ee-core.log',
       errorLogName: 'ee-error.log',
-    },
-    remote: {
-      enable: false,
-      url: 'http://electron-egg.kaka996.com/',
     },
     socketServer: {
       enable: false,
