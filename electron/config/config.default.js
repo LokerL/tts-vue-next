@@ -26,6 +26,14 @@ module.exports = () => {
       frame: true,
       show: true,
       icon: path.join(getBaseDir(), 'public', 'images', 'logo-32.png'),
+      titleBarStyle: 'hidden',
+      ...(process.platform !== 'darwin'
+        ? {
+            titleBarOverlay: {
+              color: 'rgba(0, 0, 0, 0)',
+            },
+          }
+        : {}),
     },
     logger: {
       level: 'INFO',

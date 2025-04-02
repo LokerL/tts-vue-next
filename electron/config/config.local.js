@@ -5,7 +5,10 @@
  */
 module.exports = () => {
   return {
-    openDevTools: true,
+    openDevTools: {
+      mode: 'detach',
+      activate: true,
+    },
     jobs: {
       messageLog: false,
     },
