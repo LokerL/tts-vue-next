@@ -12,10 +12,10 @@ module.exports = () => {
     singleLock: true,
     windowsOption: {
       title: 'TTS-Vue-Next',
-      width: 980,
-      height: 650,
-      minWidth: 400,
-      minHeight: 300,
+      width: 800,
+      height: 600,
+      minWidth: 800,
+      minHeight: 600,
       autoHideMenuBar: true,
       webPreferences: {
         //webSecurity: false,

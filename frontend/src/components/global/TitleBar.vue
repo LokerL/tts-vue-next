@@ -14,8 +14,8 @@
   import { ref } from 'vue';
   import { ipc } from '@/utils/ipcRenderer';
   import { ipcApiRoute } from '@/api';
-  const title = ref('');
-  ipc.invoke(ipcApiRoute.getTitle).then((r) => {
+  const title = ref('TTS-Vue-Next');
+  ipc?.invoke(ipcApiRoute.getTitle).then((r) => {
     title.value = r;
   });
 </script>
