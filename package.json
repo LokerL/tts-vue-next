@@ -18,7 +18,8 @@
         "build-we": "ee-bin build --cmds=win_e",
         "build-m": "ee-bin build --cmds=mac",
         "build-m-arm64": "ee-bin build --cmds=mac_arm64",
-        "build-l": "ee-bin build --cmds=linux"
+        "build-l": "ee-bin build --cmds=linux",
+        "format": "prettier --write electron/**/*.{js,ts,json} frontend/src/**/*.{js,ts,vue,json}"
     },
     "repository": "https://github.com/dromara/electron-egg.git",
     "keywords": [
@@ -38,6 +39,7 @@
     },
     "dependencies": {
         "ee-core": "^4.1.1",
-        "electron-updater": "^6.3.8"
+        "electron-updater": "^6.3.8",
+        "prettier": "^3.5.3"
     }
 }

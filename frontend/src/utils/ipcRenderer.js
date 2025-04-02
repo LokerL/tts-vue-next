@@ -1,4 +1,5 @@
-const Renderer = (window.require && window.require('electron')) || window.electron || {};
+const Renderer =
+  (window.require && window.require('electron')) || window.electron || {};
 
 /**
  * ipc
@@ -27,7 +28,4 @@ const ipc = Renderer.ipcRenderer || undefined;
  */
 const isEE = ipc ? true : false;
 
-export {
-  Renderer, ipc, isEE
-};
-
+export { Renderer, ipc, isEE };

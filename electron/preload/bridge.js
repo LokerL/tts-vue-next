@@ -3,8 +3,8 @@
  * 可通过contextBridge 导出api给渲染进程使用
  */
 
-const {contextBridge, ipcRenderer} = require('electron')
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: ipcRenderer,
-})
+});

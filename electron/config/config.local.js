@@ -7,7 +7,7 @@ module.exports = () => {
   return {
     openDevTools: true,
     jobs: {
-      messageLog: false
-    }
+      messageLog: false,
+    },
   };
 };

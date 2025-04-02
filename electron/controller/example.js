@@ -1,14 +1,13 @@
 'use strict';
 
-const {logger} = require('ee-core/log');
-const {exampleService} = require('../service/example');
+const { logger } = require('ee-core/log');
+const { exampleService } = require('../service/example');
 
 /**
  * example
  * @class
  */
 class ExampleController {
-
   /**
    * 所有方法接收两个参数
    * @param args 前端传的参数
