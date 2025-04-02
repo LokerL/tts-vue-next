@@ -1,4 +1,5 @@
 <template>
+  <title-bar />
   <router-view />
 </template>
 <script setup>

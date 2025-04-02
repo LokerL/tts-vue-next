@@ -4,6 +4,7 @@
  */
 const ipcApiRoute = {
   test: 'controller/example/test',
+  getTitle: 'controller/system/getTitle',
 };
 
 export { ipcApiRoute };

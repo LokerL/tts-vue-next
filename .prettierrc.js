@@ -4,7 +4,7 @@ module.exports = {
   printWidth: 80,
   singleQuote: true,
   quoteProps: 'consistent',
-  htmlWhitespaceSensitivity: 'strict',
+  htmlWhitespaceSensitivity: 'ignore',
   trailingComma: 'es5',
   bracketSpacing: true,
   arrowParens: 'always',
@@ -21,6 +21,6 @@ module.exports = {
       options: {
         printWidth: 100,
       },
-    }
+    },
   ],
 };
