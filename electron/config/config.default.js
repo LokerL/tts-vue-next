@@ -11,7 +11,7 @@ module.exports = () => {
     openDevTools: false,
     singleLock: true,
     windowsOption: {
-      title: 'tts-vue-next',
+      title: 'TTS-Vue-Next',
       width: 980,
       height: 650,
       minWidth: 400,
