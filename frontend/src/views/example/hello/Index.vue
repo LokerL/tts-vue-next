@@ -9,10 +9,42 @@
         Get Started
       </a>
     </p>
+    <p class="actions">
+      <a class="setup" @click="test">测试生成语音</a>
+    </p>
+    <p class="actions">
+      <a class="setup" @click="test2">获取列表</a>
+    </p>
   </section>
 </template>
 <script setup>
-  console.log('hello');
+  import { ipc, edge } from '@/api';
+  const test = () => {
+    ipc
+      ?.invoke(edge.tts, {
+        config: {
+          voice: 'zh-CN-XiaoyiNeural',
+          lang: 'zh-CN',
+          outputFormat: 'audio-24khz-48kbitrate-mono-mp3',
+          saveSubtitles: false,
+          proxy: null,
+          rate: 'default',
+          pitch: 'default',
+          volume: 'default',
+          timeout: 10000,
+        },
+        text: '你好啊，今天天气怎么样',
+        outputFilePath: 'C:\\Users\\Lenovo\\Desktop\\test.mp3',
+      })
+      .then((r) => {
+        console.log(r);
+      });
+  };
+  const test2 = () => {
+    ipc?.invoke(edge.getVoices).then((r) => {
+      console.log(r);
+    });
+  };
 </script>
 <style scoped>
   section {

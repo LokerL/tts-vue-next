@@ -1,6 +1,7 @@
 const { ElectronEgg } = require('ee-core');
 const { Lifecycle } = require('./preload/lifecycle');
 const { preload } = require('./preload');
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 // new app
 const app = new ElectronEgg();

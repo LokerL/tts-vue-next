@@ -12,10 +12,9 @@
 </template>
 <script setup>
   import { ref } from 'vue';
-  import { ipc } from '@/utils/ipcRenderer';
-  import { ipcApiRoute } from '@/api';
+  import { ipc, system } from '@/api';
   const title = ref('TTS-Vue-Next');
-  ipc?.invoke(ipcApiRoute.getTitle).then((r) => {
+  ipc?.invoke(system.getTitle).then((r) => {
     title.value = r;
   });
 </script>

@@ -1,7 +1,7 @@
 {
-    "name": "ee",
-    "version": "4.1.0",
-    "description": "A fast, desktop software development framework",
+    "name": "tt-vue-next",
+    "version": "1.0.0",
+    "description": "TTS Vue Next!",
     "main": "public\\electron\\main.js",
     "scripts": {
         "dev": "ee-bin dev",
@@ -21,13 +21,13 @@
         "build-l": "ee-bin build --cmds=linux",
         "format": "prettier --write electron/**/*.{js,ts,json} frontend/src/**/*.{js,ts,vue,json}"
     },
-    "repository": "https://github.com/dromara/electron-egg.git",
+    "repository": "https://github.com/LokerL/tts-vue-next.git",
     "keywords": [
         "Electron",
-        "electron-egg",
+        "tts-vue",
         "ElectronEgg"
     ],
-    "author": "哆啦好梦, Inc <530353222@qq.com>",
+    "author": "LokerL, Inc <806076693@qq.com>",
     "license": "Apache",
     "devDependencies": {
         "@electron/rebuild": "^3.7.1",
@@ -38,8 +38,10 @@
         "electron-builder": "^25.1.8"
     },
     "dependencies": {
+        "axios": "^1.8.4",
         "ee-core": "^4.1.1",
         "electron-updater": "^6.3.8",
+        "node-edge-tts": "^1.2.8",
         "prettier": "^3.5.3"
     }
 }
