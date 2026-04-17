@@ -179,7 +179,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-card rounded="xl" flat class="audio-player">
+  <v-card rounded="xl" flat class="audio-player glass-panel">
     <audio
       ref="audioRef"
       preload="metadata"
@@ -191,9 +191,14 @@ onUnmounted(() => {
     />
 
     <div class="audio-player__inner">
+      <div class="audio-player__label text-caption font-weight-medium">
+        Playback Console
+      </div>
+
       <v-btn
         icon
         variant="text"
+        aria-label="Toggle playback"
         :disabled="!ttsStore.audioUrl"
         @click="togglePlay"
       >
@@ -231,6 +236,7 @@ onUnmounted(() => {
       <v-btn
         icon
         variant="text"
+        aria-label="Save generated audio"
         :disabled="!ttsStore.audioBytes"
         @click="saveAudio"
       >
@@ -253,10 +259,15 @@ onUnmounted(() => {
 
 .audio-player__inner {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto auto auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
+}
+
+.audio-player__label {
+  color: rgb(var(--v-theme-on-surface));
+  white-space: nowrap;
 }
 
 .audio-player__time {
@@ -274,7 +285,8 @@ onUnmounted(() => {
   }
 
   .audio-player__time,
-  .audio-player__volume {
+  .audio-player__volume,
+  .audio-player__label {
     grid-column: 1 / -1;
   }
 }

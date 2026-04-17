@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { OutputFormat, TtsSettings } from "../types";
+import type { OutputFormat, ThemeMode, TtsSettings } from "../types";
 
 const MIN_RETRIES = 1;
 const MAX_RETRIES = 10;
@@ -27,6 +27,7 @@ export const useSettingsStore = defineStore("settings", {
     chunkConcurrency: 3,
     autoplay: true,
     language: "zh-CN",
+    themeMode: "system",
   }),
 
   actions: {
@@ -60,6 +61,12 @@ export const useSettingsStore = defineStore("settings", {
           MAX_CONCURRENCY,
         ),
       });
+    },
+    updateAutoplay(autoplay: boolean) {
+      this.$patch({ autoplay });
+    },
+    updateThemeMode(themeMode: ThemeMode) {
+      this.$patch({ themeMode });
     },
   },
 

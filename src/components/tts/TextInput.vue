@@ -13,16 +13,16 @@ const hasText = computed(() => ttsStore.text.length > 0);
 </script>
 
 <template>
-  <v-card flat rounded="xl" class="text-panel fill-height">
+  <v-card flat rounded="xl" class="text-panel glass-panel fill-height">
     <v-card-item class="pb-0">
       <template #prepend>
         <v-avatar color="primary" variant="tonal" size="36">
           <v-icon>mdi-text-box-edit-outline</v-icon>
         </v-avatar>
       </template>
-      <v-card-title class="text-h6">Input Text</v-card-title>
+      <v-card-title class="text-h6">Script Workspace</v-card-title>
       <v-card-subtitle>
-        Paste or type the script you want to convert into speech.
+        Draft, paste, or refine the text you want to synthesize.
       </v-card-subtitle>
     </v-card-item>
 
@@ -30,7 +30,7 @@ const hasText = computed(() => ttsStore.text.length > 0);
       <v-textarea
         v-model="text"
         placeholder="Enter text to convert to speech..."
-        variant="solo-filled"
+        variant="outlined"
         flat
         no-resize
         hide-details
@@ -68,8 +68,10 @@ const hasText = computed(() => ttsStore.text.length > 0);
 .text-panel {
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background:
-    radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.06), transparent 26%),
-    rgb(var(--v-theme-surface));
+    radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.1), transparent 30%),
+    rgba(var(--v-theme-surface), 0.78);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 60px rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .text-panel__body {

@@ -57,16 +57,16 @@ function dismissError() {
 </script>
 
 <template>
-  <v-card rounded="xl" variant="outlined" class="options-panel fill-height">
+  <v-card rounded="xl" variant="outlined" class="options-panel glass-panel fill-height">
     <v-card-item>
       <template #prepend>
         <v-avatar color="primary" variant="tonal" size="36">
           <v-icon>mdi-tune-variant</v-icon>
         </v-avatar>
       </template>
-      <v-card-title class="text-h6">Voice & Output</v-card-title>
+      <v-card-title class="text-h6">Voice Control Dock</v-card-title>
       <v-card-subtitle>
-        Tune the voice, pacing, and file format before conversion.
+        Shape voice, pacing, volume, and output format.
       </v-card-subtitle>
     </v-card-item>
 
@@ -157,7 +157,7 @@ function dismissError() {
         prepend-icon="mdi-play"
         @click="ttsStore.convert()"
       >
-        {{ ttsStore.converting ? "Converting..." : "Start Conversion" }}
+        {{ ttsStore.converting ? "Generating..." : "Generate Speech" }}
       </v-btn>
 
       <v-btn
@@ -178,8 +178,10 @@ function dismissError() {
 .options-panel {
   border-color: rgba(var(--v-border-color), var(--v-border-opacity));
   background:
-    radial-gradient(circle at top left, rgba(var(--v-theme-primary), 0.05), transparent 24%),
-    rgb(var(--v-theme-surface));
+    radial-gradient(circle at top left, rgba(var(--v-theme-primary), 0.1), transparent 28%),
+    rgba(var(--v-theme-surface), 0.78);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 60px rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .slider-group + .slider-group {

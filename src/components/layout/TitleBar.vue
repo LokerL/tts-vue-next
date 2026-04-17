@@ -1,50 +1,127 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTheme } from "vuetify";
+import { useSettingsStore } from "../../stores/settings";
 
 const theme = useTheme();
+const settingsStore = useSettingsStore();
 const isMaximized = ref(false);
+const windowActionError = ref("");
 
 const appWindow = getCurrentWindow();
+const windowActionErrorMessage = "Window action failed. Please try again.";
+let removeResizeListener: (() => void) | null = null;
+let disposed = false;
 
-async function toggleMaximize() {
-  if (await appWindow.isMaximized()) {
-    await appWindow.unmaximize();
+async function syncMaximizedState() {
+  try {
+    isMaximized.value = await appWindow.isMaximized();
+  } catch {
     isMaximized.value = false;
-  } else {
-    await appWindow.maximize();
-    isMaximized.value = true;
   }
 }
 
-function toggleTheme() {
-  theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
+async function runWindowAction(action: () => Promise<void>) {
+  try {
+    windowActionError.value = "";
+    await action();
+  } catch {
+    windowActionError.value = windowActionErrorMessage;
+  }
 }
+
+async function toggleMaximize() {
+  await runWindowAction(async () => {
+    await appWindow.toggleMaximize();
+    await syncMaximizedState();
+  });
+}
+
+function toggleTheme() {
+  settingsStore.updateThemeMode(
+    theme.global.current.value.dark ? "light" : "dark",
+  );
+}
+
+onMounted(async () => {
+  await syncMaximizedState();
+
+  try {
+    const unlisten = await appWindow.onResized(async () => {
+      await syncMaximizedState();
+    });
+
+    if (disposed) {
+      unlisten();
+      return;
+    }
+
+    removeResizeListener = unlisten;
+  } catch {
+    removeResizeListener = null;
+  }
+});
+
+onBeforeUnmount(() => {
+  disposed = true;
+  removeResizeListener?.();
+  removeResizeListener = null;
+});
 </script>
 
 <template>
-  <v-app-bar height="36" flat class="title-bar">
+  <v-app-bar height="36" flat class="title-bar glass-panel">
     <div class="drag-region" data-tauri-drag-region>
-      <span class="app-title" data-tauri-drag-region>TTS Vue Next</span>
+      <div class="app-title-wrap" data-tauri-drag-region>
+        <span class="app-title" data-tauri-drag-region>TTS Vue Next</span>
+      </div>
     </div>
     <v-spacer />
-    <v-btn icon size="small" variant="text" @click="toggleTheme">
+    <v-btn
+      icon
+      size="small"
+      variant="text"
+      aria-label="Toggle theme"
+      @click="toggleTheme">
       <v-icon size="18">
-        {{ theme.global.current.value.dark ? "mdi-weather-sunny" : "mdi-weather-night" }}
+        {{
+          theme.global.current.value.dark
+            ? "mdi-weather-sunny"
+            : "mdi-weather-night"
+        }}
       </v-icon>
     </v-btn>
-    <v-btn icon size="small" variant="text" @click="appWindow.minimize()">
+    <v-btn
+      icon
+      size="small"
+      variant="text"
+      aria-label="Minimize window"
+      @click="runWindowAction(() => appWindow.minimize())">
       <v-icon size="18">mdi-minus</v-icon>
     </v-btn>
-    <v-btn icon size="small" variant="text" @click="toggleMaximize">
+    <v-btn
+      icon
+      size="small"
+      variant="text"
+      aria-label="Toggle maximize window"
+      @click="toggleMaximize">
       <v-icon size="18">
         {{ isMaximized ? "mdi-window-restore" : "mdi-window-maximize" }}
       </v-icon>
     </v-btn>
-    <v-btn icon size="small" variant="text" class="close-btn" @click="appWindow.close()">
+    <v-btn
+      icon
+      size="small"
+      variant="text"
+      class="close-btn"
+      aria-label="Close window"
+      @click="runWindowAction(() => appWindow.close())">
       <v-icon size="18">mdi-close</v-icon>
     </v-btn>
+    <span v-if="windowActionError" role="alert" class="window-action-error">
+      {{ windowActionError }}
+    </span>
   </v-app-bar>
 </template>
 
@@ -52,6 +129,10 @@ function toggleTheme() {
 .title-bar {
   -webkit-app-region: no-drag;
   user-select: none;
+
+  border: 1px solid rgba(var(--v-theme-glass-border), 0.42);
+  background: rgba(var(--v-theme-glass), 0.58) !important;
+  backdrop-filter: blur(18px);
 }
 
 .drag-region {
@@ -60,17 +141,37 @@ function toggleTheme() {
   display: flex;
   align-items: center;
   height: 100%;
-  padding-left: 12px;
+  padding-left: 14px;
+}
+
+.app-title-wrap {
+  display: grid;
+  line-height: 1.05;
+}
+
+.app-title-kicker {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 
 .app-title {
   font-size: 13px;
-  font-weight: 500;
-  opacity: 0.8;
+  font-weight: 600;
 }
 
 .close-btn:hover {
-  background-color: #e81123 !important;
-  color: white !important;
+  background-color: rgb(var(--v-theme-error)) !important;
+  color: rgb(var(--v-theme-on-error)) !important;
+}
+
+.window-action-error {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 </style>

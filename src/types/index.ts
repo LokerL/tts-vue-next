@@ -42,6 +42,8 @@ export interface TtsSettings {
   chunkConcurrency: number;
   autoplay: boolean;
   language: string;
+  themeMode: ThemeMode;
 }
 
 export type OutputFormat = "mp3" | "wav" | "ogg" | "flac";
+export type ThemeMode = "system" | "light" | "dark";

@@ -4,6 +4,7 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import { vuetify } from "./plugins/vuetify";
 import { router } from "./router";
 import App from "./App.vue";
+import "./styles/theme.css";
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);

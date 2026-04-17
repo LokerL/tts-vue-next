@@ -4,6 +4,8 @@ use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use tauri::command;
 use tauri_plugin_dialog::DialogExt;
 
+const ALLOWED_OUTPUT_EXTENSIONS: [&str; 4] = ["mp3", "wav", "ogg", "flac"];
+
 #[command]
 pub async fn read_text_file(path: String) -> Result<String, String> {
     let file_path = Path::new(&path);
@@ -72,6 +74,81 @@ pub async fn show_in_folder(path: String) -> Result<(), String> {
             .arg(parent)
             .spawn()
             .map_err(|error| error.to_string())?;
+    }
+
+    Ok(())
+}
+
+#[command]
+pub async fn write_binary_file(path: String, data: Vec<u8>) -> Result<(), String> {
+    validate_audio_output_path(&path)?;
+
+    tokio::fs::write(&path, data)
+        .await
+        .map_err(|error| format!("Failed to write file: {error}"))
+}
+
+#[command]
+pub async fn remove_file(path: String) -> Result<(), String> {
+    validate_temporary_audio_path(&path)?;
+
+    let file_path = Path::new(&path);
+    if !file_path.exists() {
+        return Err(format!("Path not found: {path}"));
+    }
+    if !file_path.is_file() {
+        return Err("Path is not a file".to_string());
+    }
+
+    tokio::fs::remove_file(&path)
+        .await
+        .map_err(|error| format!("Failed to remove file: {error}"))
+}
+
+fn validate_audio_output_path(path: &str) -> Result<(), String> {
+    let file_path = Path::new(path);
+    let Some(file_name) = file_path.file_name().and_then(|value| value.to_str()) else {
+        return Err("Output file name is invalid".to_string());
+    };
+    if file_name.is_empty() {
+        return Err("Output file name is invalid".to_string());
+    }
+
+    let Some(parent) = file_path.parent() else {
+        return Err("Output file must include a parent directory".to_string());
+    };
+    if !parent.exists() {
+        return Err(format!("Output directory not found: {}", parent.display()));
+    }
+    if !parent.is_dir() {
+        return Err("Output parent path is not a directory".to_string());
+    }
+
+    let Some(extension) = file_path
+        .extension()
+        .and_then(|value| value.to_str())
+        .map(|value| value.to_ascii_lowercase())
+    else {
+        return Err("Output file must have an audio extension".to_string());
+    };
+
+    if !ALLOWED_OUTPUT_EXTENSIONS.contains(&extension.as_str()) {
+        return Err(format!("Unsupported output file type: .{extension}"));
+    }
+
+    Ok(())
+}
+
+fn validate_temporary_audio_path(path: &str) -> Result<(), String> {
+    validate_audio_output_path(path)?;
+
+    let file_path = Path::new(path);
+    let Some(file_name) = file_path.file_name().and_then(|value| value.to_str()) else {
+        return Err("Temporary audio file name is invalid".to_string());
+    };
+
+    if !file_name.to_ascii_lowercase().ends_with(".tmp.mp3") {
+        return Err("Only temporary audio files can be removed".to_string());
     }
 
     Ok(())
@@ -251,6 +328,57 @@ mod tests {
     #[test]
     fn test_map_selected_folder_handles_none() {
         assert_eq!(map_selected_folder(None), None);
+    }
+
+    #[tokio::test]
+    async fn test_write_binary_file_writes_bytes_to_disk() {
+        let path = unique_temp_path("mp3");
+
+        write_binary_file(path.to_string_lossy().into_owned(), vec![1, 2, 3])
+            .await
+            .unwrap();
+
+        let result = tokio::fs::read(&path).await.unwrap();
+
+        assert_eq!(result, vec![1, 2, 3]);
+        let _ = tokio::fs::remove_file(path).await;
+    }
+
+    #[tokio::test]
+    async fn test_remove_file_deletes_existing_temp_audio_file() {
+        let path = env::temp_dir().join(format!("tts-vue-next-{}.tmp.mp3", Uuid::new_v4()));
+        tokio::fs::write(&path, b"temporary file").await.unwrap();
+
+        remove_file(path.to_string_lossy().into_owned())
+            .await
+            .unwrap();
+
+        assert!(!path.exists());
+    }
+
+    #[tokio::test]
+    async fn test_write_binary_file_rejects_non_audio_path() {
+        let path = unique_temp_path("txt");
+
+        let error = write_binary_file(path.to_string_lossy().into_owned(), vec![1, 2, 3])
+            .await
+            .unwrap_err();
+
+        assert!(error.contains("Unsupported output file type"));
+        assert!(!path.exists());
+    }
+
+    #[tokio::test]
+    async fn test_remove_file_rejects_non_temp_audio_path() {
+        let path = unique_temp_path("mp3");
+        tokio::fs::write(&path, b"audio").await.unwrap();
+
+        let error = remove_file(path.to_string_lossy().into_owned())
+            .await
+            .unwrap_err();
+
+        assert!(error.contains("Only temporary audio files can be removed"));
+        let _ = tokio::fs::remove_file(path).await;
     }
 
     fn unique_temp_path(extension: &str) -> PathBuf {

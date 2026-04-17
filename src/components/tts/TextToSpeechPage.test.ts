@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import rawTextToSpeechView from "../../views/TextToSpeech.vue?raw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
@@ -32,7 +33,8 @@ const voicesFixture: Voice[] = [
 ];
 
 const passthroughStub = defineComponent({
-  template: "<div><slot /></div>",
+  inheritAttrs: false,
+  template: '<div v-bind="$attrs"><slot /></div>',
 });
 
 const textareaStub = defineComponent({
@@ -139,12 +141,62 @@ describe("TextToSpeech view", () => {
       .map((button) => button.text())
       .filter(Boolean);
 
-    expect(wrapper.text()).toContain("Input Text");
-    expect(wrapper.text()).toContain("Voice & Output");
+    expect(wrapper.text()).toContain("Script Workspace");
+    expect(wrapper.text()).toContain("Voice Control Dock");
     expect(wrapper.find("textarea").exists()).toBe(true);
     expect(wrapper.find("audio").exists()).toBe(true);
     expect(buttonLabels).toContain("Clear");
-    expect(buttonLabels).toContain("Start Conversion");
+    expect(buttonLabels).toContain("Generate Speech");
     expect(invokeMock).toHaveBeenCalledWith("get_voices");
+  });
+
+  test("renders Aero Glass workspace regions", async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const { default: TextToSpeech } = await import("../../views/TextToSpeech.vue");
+    const wrapper = mount(TextToSpeech, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          VContainer: passthroughStub,
+          VRow: passthroughStub,
+          VCol: passthroughStub,
+          VCard: passthroughStub,
+          VCardItem: passthroughStub,
+          VAvatar: passthroughStub,
+          VIcon: passthroughStub,
+          VCardTitle: passthroughStub,
+          VCardSubtitle: passthroughStub,
+          VCardText: passthroughStub,
+          VTextarea: textareaStub,
+          VDivider: passthroughStub,
+          VCardActions: passthroughStub,
+          VChip: passthroughStub,
+          VSpacer: passthroughStub,
+          VBtn: buttonStub,
+          VSlider: sliderStub,
+          VSelect: selectStub,
+          VSheet: passthroughStub,
+          VAlert: passthroughStub,
+        },
+      },
+    });
+
+    await flushPromises();
+
+    expect(wrapper.find(".tts-page").exists()).toBe(true);
+    expect(wrapper.find(".tts-page__hero").exists()).toBe(true);
+    expect(wrapper.find(".tts-workspace").exists()).toBe(true);
+    expect(wrapper.find(".tts-workspace__input").exists()).toBe(true);
+    expect(wrapper.find(".tts-workspace__control").exists()).toBe(true);
+    expect(wrapper.find(".tts-workspace__player").exists()).toBe(true);
+    expect(wrapper.find(".options-panel.glass-panel").exists()).toBe(true);
+    expect(wrapper.text()).toContain("Aero Glass Studio");
+    expect(wrapper.text()).toContain("Create speech with layered voice controls");
+    expect(wrapper.text()).toContain(
+      "Shape voice, pacing, volume, and output format.",
+    );
+    expect(rawTextToSpeechView).not.toContain("calc(100vh");
   });
 });

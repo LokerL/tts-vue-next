@@ -28,10 +28,12 @@ vi.mock("@tauri-apps/api/core", () => ({
 }));
 
 const passthroughStub = defineComponent({
-  template: "<div><slot /></div>",
+  inheritAttrs: false,
+  template: '<div v-bind="$attrs"><slot /></div>',
 });
 
 const buttonStub = defineComponent({
+  inheritAttrs: false,
   props: {
     disabled: {
       type: Boolean,
@@ -39,7 +41,8 @@ const buttonStub = defineComponent({
     },
   },
   emits: ["click"],
-  template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+  template:
+    '<button v-bind="$attrs" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
 });
 
 const sliderStub = defineComponent({
@@ -64,6 +67,25 @@ describe("AudioPlayer", () => {
       audioBytes: new Uint8Array([1, 2, 3]),
       error: null,
     });
+  });
+
+  test("renders the Aero Glass playback console with labeled icon controls", async () => {
+    const { default: AudioPlayer } = await import("./AudioPlayer.vue");
+    const wrapper = mount(AudioPlayer, {
+      global: {
+        stubs: {
+          VCard: passthroughStub,
+          VBtn: buttonStub,
+          VIcon: passthroughStub,
+          VSlider: sliderStub,
+        },
+      },
+    });
+
+    expect(wrapper.find(".audio-player.glass-panel").exists()).toBe(true);
+    expect(wrapper.text()).toContain("Playback Console");
+    expect(wrapper.find('button[aria-label="Toggle playback"]').exists()).toBe(true);
+    expect(wrapper.find('button[aria-label="Save generated audio"]').exists()).toBe(true);
   });
 
   test("preserves the original save error when temp file cleanup also fails", async () => {

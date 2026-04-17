@@ -5,22 +5,30 @@ import TtsOptions from "../components/tts/TtsOptions.vue";
 </script>
 
 <template>
-  <v-container fluid class="tts-view pa-4 pa-md-6">
-    <v-row class="tts-view__grid" align="stretch">
-      <v-col cols="12" lg="8">
-        <TextInput />
-      </v-col>
-      <v-col cols="12" lg="4">
-        <TtsOptions />
-      </v-col>
-    </v-row>
+  <v-container fluid class="page-shell tts-page pa-4 pa-md-6">
+    <section class="tts-page__hero section-hero glass-panel">
+      <p class="section-eyebrow">Aero Glass Studio</p>
+      <h1>Create speech with layered voice controls</h1>
+    </section>
 
-    <AudioPlayer />
+    <section class="tts-workspace">
+      <div class="tts-workspace__input">
+        <TextInput />
+      </div>
+
+      <div class="tts-workspace__control">
+        <TtsOptions />
+      </div>
+
+      <div class="tts-workspace__player">
+        <AudioPlayer />
+      </div>
+    </section>
   </v-container>
 </template>
 
 <style scoped>
-.tts-view {
+.tts-page {
   min-height: 100%;
   padding-bottom: 88px;
   background:
@@ -28,13 +36,23 @@ import TtsOptions from "../components/tts/TtsOptions.vue";
     linear-gradient(180deg, rgba(var(--v-theme-surface), 1), rgba(var(--v-theme-surface), 0.98));
 }
 
-.tts-view__grid {
-  min-height: calc(100vh - 156px);
+.tts-page__hero {
+  margin-bottom: 24px;
+}
+
+.tts-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 24px;
+}
+
+.tts-workspace__player {
+  grid-column: 1 / -1;
 }
 
 @media (max-width: 1280px) {
-  .tts-view__grid {
-    min-height: auto;
+  .tts-workspace {
+    grid-template-columns: 1fr;
   }
 }
 </style>
