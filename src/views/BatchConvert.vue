@@ -18,9 +18,12 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
     <section class="batch-page__hero section-hero glass-panel">
       <div>
         <div class="text-overline text-primary mb-2">Batch Workflow Studio</div>
-        <h1 class="text-h4 mb-2">Convert document queues with clear progress controls</h1>
+        <h1 class="text-h4 mb-2">
+          Convert document queues with clear progress controls
+        </h1>
         <p class="text-body-1 text-medium-emphasis mb-0">
-          Queue text files, review progress per item, and export audio with controlled concurrency.
+          Queue text files, review progress per item, and export audio with
+          controlled concurrency.
         </p>
       </div>
     </section>
@@ -35,7 +38,7 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
       </div>
 
       <div class="batch-workspace__actions">
-        <v-card rounded="xl" variant="outlined" class="batch-actions glass-panel">
+        <v-card variant="outlined" class="batch-actions glass-panel">
           <div class="batch-actions__row pa-4">
             <div class="d-flex align-center ga-2 flex-wrap">
               <v-btn
@@ -43,15 +46,15 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
                 :loading="batchStore.converting"
                 :disabled="batchStore.files.length === 0"
                 prepend-icon="mdi-play"
-                @click="batchStore.convertAll()"
-              >
+                @click="batchStore.convertAll()">
                 Start All
               </v-btn>
               <v-btn
                 variant="outlined"
-                :disabled="batchStore.converting || batchStore.files.length === 0"
-                @click="batchStore.clearFiles()"
-              >
+                :disabled="
+                  batchStore.converting || batchStore.files.length === 0
+                "
+                @click="batchStore.clearFiles()">
                 Clear
               </v-btn>
             </div>
@@ -63,8 +66,7 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
                 label="Concurrency"
                 style="width: 136px"
                 hide-details
-                @update:model-value="settingsStore.updateFileConcurrency"
-              />
+                @update:model-value="settingsStore.updateFileConcurrency" />
             </div>
           </div>
         </v-card>
@@ -78,8 +80,16 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
   min-height: 100%;
   padding: 24px;
   background:
-    radial-gradient(circle at top left, rgba(var(--v-theme-primary), 0.08), transparent 22%),
-    linear-gradient(180deg, rgba(var(--v-theme-surface), 1), rgba(var(--v-theme-surface), 0.98));
+    radial-gradient(
+      circle at top left,
+      rgba(var(--v-theme-primary), 0.08),
+      transparent 22%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--v-theme-surface), 1),
+      rgba(var(--v-theme-surface), 0.98)
+    );
 }
 
 .batch-page__hero {

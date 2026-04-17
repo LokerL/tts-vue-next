@@ -6,12 +6,19 @@ import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
 import { useBatchStore } from "../../stores/batch";
 
-const { openMock } = vi.hoisted(() => ({
+const { openMock, messageErrorMock } = vi.hoisted(() => ({
   openMock: vi.fn(),
+  messageErrorMock: vi.fn(),
 }));
 
 vi.mock("@tauri-apps/plugin-dialog", () => ({
   open: openMock,
+}));
+
+vi.mock("vuetify-message-vue3", () => ({
+  useMessage: () => ({
+    error: messageErrorMock,
+  }),
 }));
 
 const cardStub = defineComponent({
@@ -41,11 +48,6 @@ const iconStub = defineComponent({
   template: '<span v-bind="$attrs"><slot /></span>',
 });
 
-const alertStub = defineComponent({
-  inheritAttrs: false,
-  template: '<div v-bind="$attrs"><slot /></div>',
-});
-
 describe("FileUpload", () => {
   let pinia: ReturnType<typeof createPinia>;
 
@@ -66,7 +68,6 @@ describe("FileUpload", () => {
           VBtn: buttonStub,
           VAvatar: avatarStub,
           VIcon: iconStub,
-          VAlert: alertStub,
         },
       },
     });

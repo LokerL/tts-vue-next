@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
+import { useMessage } from "vuetify-message-vue3";
 import { useBatchStore } from "../../stores/batch";
 
 const SUPPORTED_EXTENSIONS = new Set(["txt", "md", "markdown", "docx"]);
 
 const batchStore = useBatchStore();
+const message = useMessage();
 const isDragOver = ref(false);
 const fileError = ref<string | null>(null);
 
@@ -23,9 +25,14 @@ function filterSupportedPaths(paths: string[]): string[] {
 
 function setUnsupportedFilesError(paths: string[]) {
   const unsupportedPaths = paths.filter((path) => !isSupportedPath(path));
-  fileError.value = unsupportedPaths.length > 0
-    ? `Unsupported file types: ${unsupportedPaths.map((path) => path.split(/[\\/]/).pop() || path).join(", ")}`
-    : null;
+  fileError.value =
+    unsupportedPaths.length > 0
+      ? `Unsupported file types: ${unsupportedPaths.map((path) => path.split(/[\\/]/).pop() || path).join(", ")}`
+      : null;
+
+  if (fileError.value) {
+    message.error(fileError.value);
+  }
 }
 
 function parseDroppedPaths(event: DragEvent): string[] {
@@ -85,6 +92,7 @@ async function openFilePicker() {
     }
   } catch (error) {
     fileError.value = error instanceof Error ? error.message : String(error);
+    message.error(fileError.value);
   }
 }
 
@@ -107,7 +115,6 @@ function onDrop(event: DragEvent) {
 <template>
   <div>
     <v-card
-      rounded="xl"
       variant="outlined"
       class="file-upload glass-panel pa-8 pa-md-10 text-center"
       :class="{
@@ -119,27 +126,22 @@ function onDrop(event: DragEvent) {
       @click="openFilePicker"
       @dragover.prevent="onDragOver"
       @dragleave="onDragLeave"
-      @drop.prevent="onDrop"
-    >
+      @drop.prevent="onDrop">
       <v-avatar size="56" color="primary" variant="tonal" class="mb-4">
         <v-icon size="28">mdi-file-upload-outline</v-icon>
       </v-avatar>
       <div class="text-h6 mb-2">Drop text files into the queue</div>
       <div class="text-body-2 text-medium-emphasis mb-4">
-        Click to browse, or drop `.txt`, `.md`, `.markdown`, and `.docx` files here.
+        Click to browse, or drop `.txt`, `.md`, `.markdown`, and `.docx` files
+        here.
       </div>
-      <v-btn color="primary" prepend-icon="mdi-folder-open-outline" :disabled="isDisabled">Choose Files</v-btn>
+      <v-btn
+        color="primary"
+        prepend-icon="mdi-folder-open-outline"
+        :disabled="isDisabled"
+        >Choose Files</v-btn
+      >
     </v-card>
-
-    <v-alert
-      v-if="fileError"
-      type="error"
-      density="compact"
-      variant="tonal"
-      class="mt-3"
-    >
-      {{ fileError }}
-    </v-alert>
   </div>
 </template>
 
@@ -149,9 +151,16 @@ function onDrop(event: DragEvent) {
   border-style: dashed;
   border-color: rgba(var(--v-theme-primary), 0.28);
   background:
-    radial-gradient(circle at top, rgba(var(--v-theme-primary), 0.08), transparent 46%),
+    radial-gradient(
+      circle at top,
+      rgba(var(--v-theme-primary), 0.08),
+      transparent 46%
+    ),
     rgb(var(--v-theme-surface));
-  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .file-upload:not(.file-upload--disabled):hover,
@@ -159,7 +168,11 @@ function onDrop(event: DragEvent) {
   border-color: rgb(var(--v-theme-primary));
   transform: translateY(-1px);
   background:
-    radial-gradient(circle at top, rgba(var(--v-theme-primary), 0.12), transparent 46%),
+    radial-gradient(
+      circle at top,
+      rgba(var(--v-theme-primary), 0.12),
+      transparent 46%
+    ),
     rgb(var(--v-theme-surface));
 }
 

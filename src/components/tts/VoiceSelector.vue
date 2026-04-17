@@ -46,40 +46,14 @@ const voiceItems = computed(() =>
       label="Language"
       :loading="voicesStore.loading"
       prepend-inner-icon="mdi-translate"
-      class="mb-3"
-    />
+      class="mb-3" />
 
     <v-select
       v-model="selectedVoice"
       :items="voiceItems"
       label="Voice"
       :loading="voicesStore.loading"
-      prepend-inner-icon="mdi-account-voice"
-    />
-
-    <v-sheet
-      v-if="voicesStore.currentVoice"
-      rounded="lg"
-      border
-      class="voice-selector__summary mt-3"
-    >
-      <div class="text-body-2 font-weight-medium">
-        {{ voicesStore.currentVoice.FriendlyName || voicesStore.currentVoice.ShortName }}
-      </div>
-      <div class="text-caption text-medium-emphasis mt-1">
-        {{ voicesStore.currentVoice.Locale }} · {{ voicesStore.currentVoice.Gender }}
-      </div>
-    </v-sheet>
-
-    <v-alert
-      v-if="voicesStore.error"
-      type="error"
-      density="compact"
-      variant="tonal"
-      class="mt-3"
-    >
-      {{ voicesStore.error }}
-    </v-alert>
+      prepend-inner-icon="mdi-account-voice" />
   </div>
 </template>
 

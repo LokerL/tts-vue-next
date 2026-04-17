@@ -71,10 +71,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <v-app-bar height="36" flat class="title-bar glass-panel">
-    <div class="drag-region" data-tauri-drag-region>
-      <div class="app-title-wrap" data-tauri-drag-region>
-        <span class="app-title" data-tauri-drag-region>TTS Vue Next</span>
+  <v-app-bar
+    height="36"
+    flat
+    class="title-bar glass-panel"
+    data-tauri-drag-region>
+    <div class="drag-region">
+      <div class="app-title-wrap">
+        <span class="app-title">TTS Vue Next</span>
       </div>
     </div>
     <v-spacer />
@@ -133,6 +137,7 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(var(--v-theme-glass-border), 0.42);
   background: rgba(var(--v-theme-glass), 0.58) !important;
   backdrop-filter: blur(18px);
+  -webkit-app-region: drag;
 }
 
 .drag-region {

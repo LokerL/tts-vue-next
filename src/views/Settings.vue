@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { useMessage } from "vuetify-message-vue3";
 import { useSettingsStore } from "../stores/settings";
 
 const settingsStore = useSettingsStore();
-const savePathError = ref<string | null>(null);
+const message = useMessage();
 
 const formatOptions = [
   { title: "MP3", value: "mp3" },
@@ -25,13 +25,12 @@ const concurrencyOptions = [1, 2, 3, 4, 5].map((value) => ({
 
 async function selectSavePath() {
   try {
-    savePathError.value = null;
     const path = await invoke<string | null>("select_folder");
     if (path) {
       settingsStore.updateSavePath(path);
     }
   } catch (error) {
-    savePathError.value = error instanceof Error ? error.message : String(error);
+    message.error(error instanceof Error ? error.message : String(error));
   }
 }
 </script>
@@ -43,74 +42,61 @@ async function selectSavePath() {
         <div class="text-overline text-primary mb-2">Preferences</div>
         <h1 class="text-h4 mb-2">Tune output and processing behavior</h1>
         <p class="text-body-1 text-medium-emphasis mb-0">
-          Choose where converted audio is saved and how aggressively batch jobs should run.
+          Choose where converted audio is saved and how aggressively batch jobs
+          should run.
         </p>
       </div>
     </section>
 
-    <v-card rounded="xl" class="mb-4" variant="outlined">
+    <v-card class="mb-4" variant="outlined">
       <v-card-title class="text-subtitle-1">Output</v-card-title>
       <v-card-text>
-        <v-alert
-          v-if="savePathError"
-          type="error"
-          density="compact"
-          variant="tonal"
-          class="mb-4"
-        >
-          {{ savePathError }}
-        </v-alert>
         <v-text-field
           :model-value="settingsStore.savePath"
           label="Save Path"
           readonly
           append-inner-icon="mdi-folder-outline"
           placeholder="Click to select..."
-          @click="selectSavePath"
-        />
+          @click="selectSavePath" />
         <v-select
           :model-value="settingsStore.outputFormat"
           :items="formatOptions"
           label="Default Format"
-          @update:model-value="settingsStore.updateOutputFormat"
-        />
+          @update:model-value="settingsStore.updateOutputFormat" />
         <v-switch
           :model-value="settingsStore.autoplay"
           label="Auto-play after conversion"
           color="primary"
           hide-details
-          @update:model-value="(value) => settingsStore.updateAutoplay(Boolean(value))"
-        />
+          @update:model-value="
+            (value) => settingsStore.updateAutoplay(Boolean(value))
+          " />
       </v-card-text>
     </v-card>
 
-    <v-card rounded="xl" class="mb-4" variant="outlined">
+    <v-card class="mb-4" variant="outlined">
       <v-card-title class="text-subtitle-1">Processing</v-card-title>
       <v-card-text>
         <v-select
           :model-value="settingsStore.maxRetries"
           :items="retryOptions"
           label="Max Retries"
-          @update:model-value="settingsStore.updateMaxRetries"
-        />
+          @update:model-value="settingsStore.updateMaxRetries" />
         <v-select
           :model-value="settingsStore.fileConcurrency"
           :items="concurrencyOptions"
           label="File Concurrency"
-          @update:model-value="settingsStore.updateFileConcurrency"
-        />
+          @update:model-value="settingsStore.updateFileConcurrency" />
       </v-card-text>
     </v-card>
 
-    <v-card rounded="xl" variant="outlined">
+    <v-card variant="outlined">
       <v-card-title class="text-subtitle-1">About</v-card-title>
       <v-card-text>
-        <div class="text-body-2 mb-2">
-          <strong>TTS Vue Next</strong> v0.1.0
-        </div>
+        <div class="text-body-2 mb-2"><strong>TTS Vue Next</strong> v0.1.0</div>
         <div class="text-caption text-medium-emphasis">
-          A desktop TTS application powered by Microsoft Edge TTS service and built with Vue 3,
-          Vuetify, and Tauri.
+          A desktop TTS application powered by Microsoft Edge TTS service and
+          built with Vue 3, Vuetify, and Tauri.
         </div>
       </v-card-text>
     </v-card>
@@ -122,8 +108,16 @@ async function selectSavePath() {
   min-height: 100%;
   max-width: 860px;
   background:
-    radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.08), transparent 24%),
-    linear-gradient(180deg, rgba(var(--v-theme-surface), 1), rgba(var(--v-theme-surface), 0.98));
+    radial-gradient(
+      circle at top right,
+      rgba(var(--v-theme-primary), 0.08),
+      transparent 24%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--v-theme-surface), 1),
+      rgba(var(--v-theme-surface), 0.98)
+    );
 }
 
 .settings-view :deep(.v-card) {

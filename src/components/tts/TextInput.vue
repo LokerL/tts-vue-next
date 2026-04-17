@@ -8,24 +8,14 @@ const text = computed({
   get: () => ttsStore.text,
   set: (value: string) => ttsStore.setText(value),
 });
+import { useMessage } from "vuetify-message-vue3";
 
+const message = useMessage();
 const hasText = computed(() => ttsStore.text.length > 0);
 </script>
 
 <template>
-  <v-card flat rounded="xl" class="text-panel glass-panel fill-height">
-    <v-card-item class="pb-0">
-      <template #prepend>
-        <v-avatar color="primary" variant="tonal" size="36">
-          <v-icon>mdi-text-box-edit-outline</v-icon>
-        </v-avatar>
-      </template>
-      <v-card-title class="text-h6">Script Workspace</v-card-title>
-      <v-card-subtitle>
-        Draft, paste, or refine the text you want to synthesize.
-      </v-card-subtitle>
-    </v-card-item>
-
+  <v-card flat class="text-panel glass-panel">
     <v-card-text class="text-panel__body">
       <v-textarea
         v-model="text"
@@ -35,8 +25,7 @@ const hasText = computed(() => ttsStore.text.length > 0);
         no-resize
         hide-details
         rows="18"
-        class="text-panel__field"
-      />
+        class="text-panel__field" />
     </v-card-text>
 
     <v-divider />
@@ -56,8 +45,7 @@ const hasText = computed(() => ttsStore.text.length > 0);
         variant="text"
         prepend-icon="mdi-delete-outline"
         :disabled="!hasText || ttsStore.converting"
-        @click="ttsStore.clear()"
-      >
+        @click="ttsStore.clear()">
         Clear
       </v-btn>
     </v-card-actions>
@@ -68,7 +56,11 @@ const hasText = computed(() => ttsStore.text.length > 0);
 .text-panel {
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background:
-    radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.1), transparent 30%),
+    radial-gradient(
+      circle at top right,
+      rgba(var(--v-theme-primary), 0.1),
+      transparent 30%
+    ),
     rgba(var(--v-theme-surface), 0.78);
   backdrop-filter: blur(18px);
   box-shadow: 0 18px 60px rgba(var(--v-theme-on-surface), 0.08);

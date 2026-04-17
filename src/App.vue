@@ -5,13 +5,16 @@ import TitleBar from "./components/layout/TitleBar.vue";
 import AppLayout from "./components/layout/AppLayout.vue";
 import { useSettingsStore } from "./stores/settings";
 import { resolveThemeName } from "./utils/themeMode";
+import { MessageProvider } from "vuetify-message-vue3";
 
 const theme = useTheme();
 const settingsStore = useSettingsStore();
 let media: MediaQueryList | null = null;
 
 function applyTheme() {
-  theme.global.name.value = resolveThemeName(settingsStore.themeMode, media?.matches ?? false);
+  theme.change(
+    resolveThemeName(settingsStore.themeMode, media?.matches ?? false),
+  );
 }
 
 onMounted(() => {
@@ -30,8 +33,10 @@ watch(() => settingsStore.themeMode, applyTheme);
 
 <template>
   <v-app>
-    <TitleBar />
-    <AppLayout />
+    <MessageProvider>
+      <TitleBar />
+      <AppLayout />
+    </MessageProvider>
   </v-app>
 </template>
 

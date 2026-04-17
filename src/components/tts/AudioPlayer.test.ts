@@ -7,11 +7,12 @@ import { defineComponent } from "vue";
 import { useSettingsStore } from "../../stores/settings";
 import { useTtsStore } from "../../stores/tts";
 
-const { saveMock, writeFileMock, removeMock, invokeMock } = vi.hoisted(() => ({
+const { saveMock, writeFileMock, removeMock, invokeMock, messageErrorMock } = vi.hoisted(() => ({
   saveMock: vi.fn(),
   writeFileMock: vi.fn(),
   removeMock: vi.fn(),
   invokeMock: vi.fn(),
+  messageErrorMock: vi.fn(),
 }));
 
 vi.mock("@tauri-apps/plugin-dialog", () => ({
@@ -25,6 +26,12 @@ vi.mock("@tauri-apps/plugin-fs", () => ({
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: invokeMock,
+}));
+
+vi.mock("vuetify-message-vue3", () => ({
+  useMessage: () => ({
+    error: messageErrorMock,
+  }),
 }));
 
 const passthroughStub = defineComponent({

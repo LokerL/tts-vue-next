@@ -6,12 +6,22 @@ import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
 import { useBatchStore } from "../stores/batch";
 
+const { messageErrorMock } = vi.hoisted(() => ({
+  messageErrorMock: vi.fn(),
+}));
+
 vi.mock("@tauri-apps/plugin-dialog", () => ({
   open: vi.fn(),
 }));
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: vi.fn(),
+}));
+
+vi.mock("vuetify-message-vue3", () => ({
+  useMessage: () => ({
+    error: messageErrorMock,
+  }),
 }));
 
 const passthroughStub = defineComponent({
@@ -47,10 +57,6 @@ const tableStub = defineComponent({
   template: '<table :class="$attrs.class"><slot /></table>',
 });
 
-const alertStub = defineComponent({
-  template: '<div :class="$attrs.class"><slot /></div>',
-});
-
 const progressStub = defineComponent({
   template: '<div class="progress-stub" />',
 });
@@ -65,14 +71,6 @@ const iconStub = defineComponent({
 
 const chipStub = defineComponent({
   template: '<span><slot /></span>',
-});
-
-const fileUploadStub = defineComponent({
-  template: '<div class="file-upload-stub">Upload Zone</div>',
-});
-
-const fileListStub = defineComponent({
-  template: '<div class="file-list-stub">File List</div>',
 });
 
 describe("BatchConvert view", () => {
@@ -123,7 +121,6 @@ describe("BatchConvert view", () => {
           VSpacer: passthroughStub,
           VCard: cardStub,
           VTable: tableStub,
-          VAlert: alertStub,
           VProgressLinear: progressStub,
           VAvatar: avatarStub,
           VIcon: iconStub,
@@ -161,7 +158,6 @@ describe("BatchConvert view", () => {
           VSpacer: passthroughStub,
           VCard: cardStub,
           VTable: tableStub,
-          VAlert: alertStub,
           VProgressLinear: progressStub,
           VAvatar: avatarStub,
           VIcon: iconStub,

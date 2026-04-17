@@ -38,6 +38,9 @@ importers:
       vuetify:
         specifier: ^3.12.5
         version: 3.12.5(typescript@5.6.3)(vue@3.5.32(typescript@5.6.3))
+      vuetify-message-vue3:
+        specifier: ^1.1.2
+        version: 1.1.2(vue@3.5.32(typescript@5.6.3))(vuetify@3.12.5(typescript@5.6.3)(vue@3.5.32(typescript@5.6.3)))
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^2
@@ -1053,6 +1056,12 @@ packages:
       typescript:
         optional: true
 
+  vuetify-message-vue3@1.1.2:
+    resolution: {integrity: sha512-XN72+7XiLjELXFb8iTmNiBSl0MP/2gXTFiwWt1sRmSbPfP0eusTiAtusPKTX4SXbFygCgYFIBZxRqXK7koL4tg==}
+    peerDependencies:
+      vue: '>3.0.0'
+      vuetify: '>3.0.0'
+
   vuetify@3.12.5:
     resolution: {integrity: sha512-Gk3eDIiBXpv+QjMTYmXXk/uvpqaSNAgprcV/Og0btBUx4saLN7AUmqUi34hRmBqu2tpype2GVvg2yxJUqP2mdg==}
     peerDependencies:
@@ -1923,6 +1932,11 @@ snapshots:
       '@vue/shared': 3.5.32
     optionalDependencies:
       typescript: 5.6.3
+
+  vuetify-message-vue3@1.1.2(vue@3.5.32(typescript@5.6.3))(vuetify@3.12.5(typescript@5.6.3)(vue@3.5.32(typescript@5.6.3))):
+    dependencies:
+      vue: 3.5.32(typescript@5.6.3)
+      vuetify: 3.12.5(typescript@5.6.3)(vue@3.5.32(typescript@5.6.3))
 
   vuetify@3.12.5(typescript@5.6.3)(vue@3.5.32(typescript@5.6.3)):
     dependencies:

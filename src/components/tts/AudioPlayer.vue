@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from "vue";
+import { useMessage } from "vuetify-message-vue3";
 import { useSettingsStore } from "../../stores/settings";
 import { useTtsStore } from "../../stores/tts";
 
 const ttsStore = useTtsStore();
 const settingsStore = useSettingsStore();
+const message = useMessage();
 
 const audioRef = ref<HTMLAudioElement | null>(null);
 const isPlaying = ref(false);
@@ -38,10 +40,14 @@ async function togglePlay() {
     return;
   }
 
+  ttsStore.$patch({ error: null });
+
   try {
     await audioRef.value.play();
   } catch (error) {
-    ttsStore.$patch({ error: toErrorMessage(error) });
+    const errorMessage = toErrorMessage(error);
+    ttsStore.$patch({ error: errorMessage });
+    message.error(errorMessage);
   }
 }
 
@@ -56,7 +62,9 @@ function onLoadedMetadata() {
     return;
   }
 
-  duration.value = Number.isFinite(audioRef.value.duration) ? audioRef.value.duration : 0;
+  duration.value = Number.isFinite(audioRef.value.duration)
+    ? audioRef.value.duration
+    : 0;
   audioRef.value.volume = playerVolume.value / 100;
 }
 
@@ -86,6 +94,8 @@ async function saveAudio() {
   if (!ttsStore.audioBytes) {
     return;
   }
+
+  ttsStore.$patch({ error: null });
 
   try {
     const { save } = await import("@tauri-apps/plugin-dialog");
@@ -136,7 +146,9 @@ async function saveAudio() {
       throw saveError;
     }
   } catch (error) {
-    ttsStore.$patch({ error: toErrorMessage(error) });
+    const errorMessage = toErrorMessage(error);
+    ttsStore.$patch({ error: errorMessage });
+    message.error(errorMessage);
   }
 }
 
@@ -162,10 +174,14 @@ watch(
     audioRef.value.volume = playerVolume.value / 100;
 
     if (settingsStore.autoplay) {
+      ttsStore.$patch({ error: null });
+
       try {
         await audioRef.value.play();
       } catch (error) {
-        ttsStore.$patch({ error: toErrorMessage(error) });
+        const errorMessage = toErrorMessage(error);
+        ttsStore.$patch({ error: errorMessage });
+        message.error(errorMessage);
       }
     }
   },
@@ -179,7 +195,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-card rounded="xl" flat class="audio-player glass-panel">
+  <v-card flat class="audio-player glass-panel">
     <audio
       ref="audioRef"
       preload="metadata"
@@ -187,8 +203,7 @@ onUnmounted(() => {
       @loadedmetadata="onLoadedMetadata"
       @play="isPlaying = true"
       @pause="isPlaying = false"
-      @ended="onEnded"
-    />
+      @ended="onEnded" />
 
     <div class="audio-player__inner">
       <div class="audio-player__label text-caption font-weight-medium">
@@ -200,8 +215,7 @@ onUnmounted(() => {
         variant="text"
         aria-label="Toggle playback"
         :disabled="!ttsStore.audioUrl"
-        @click="togglePlay"
-      >
+        @click="togglePlay">
         <v-icon>{{ isPlaying ? "mdi-pause" : "mdi-play" }}</v-icon>
       </v-btn>
 
@@ -217,8 +231,7 @@ onUnmounted(() => {
         density="compact"
         color="primary"
         class="audio-player__progress"
-        @update:model-value="seek"
-      />
+        @update:model-value="seek" />
 
       <div class="audio-player__volume d-flex align-center ga-2">
         <v-icon size="small">mdi-volume-high</v-icon>
@@ -229,8 +242,7 @@ onUnmounted(() => {
           hide-details
           density="compact"
           style="width: 92px"
-          @update:model-value="updateVolume"
-        />
+          @update:model-value="updateVolume" />
       </div>
 
       <v-btn
@@ -238,8 +250,7 @@ onUnmounted(() => {
         variant="text"
         aria-label="Save generated audio"
         :disabled="!ttsStore.audioBytes"
-        @click="saveAudio"
-      >
+        @click="saveAudio">
         <v-icon>mdi-content-save</v-icon>
       </v-btn>
     </div>

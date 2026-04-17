@@ -6,12 +6,19 @@ import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
 import { useSettingsStore } from "../stores/settings";
 
-const { invokeMock } = vi.hoisted(() => ({
+const { invokeMock, messageErrorMock } = vi.hoisted(() => ({
   invokeMock: vi.fn(),
+  messageErrorMock: vi.fn(),
 }));
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: invokeMock,
+}));
+
+vi.mock("vuetify-message-vue3", () => ({
+  useMessage: () => ({
+    error: messageErrorMock,
+  }),
 }));
 
 const passthroughStub = defineComponent({
@@ -86,7 +93,6 @@ describe("Settings view", () => {
           VTextField: textFieldStub,
           VSelect: selectStub,
           VSwitch: switchStub,
-          VAlert: passthroughStub,
         },
       },
     });
@@ -114,7 +120,6 @@ describe("Settings view", () => {
           VTextField: textFieldStub,
           VSelect: selectStub,
           VSwitch: switchStub,
-          VAlert: passthroughStub,
         },
       },
     });

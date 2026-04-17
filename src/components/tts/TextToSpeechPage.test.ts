@@ -8,12 +8,19 @@ import { defineComponent } from "vue";
 import type { Voice } from "../../types";
 import { useTtsStore } from "../../stores/tts";
 
-const { invokeMock } = vi.hoisted(() => ({
+const { invokeMock, messageErrorMock } = vi.hoisted(() => ({
   invokeMock: vi.fn(),
+  messageErrorMock: vi.fn(),
 }));
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: invokeMock,
+}));
+
+vi.mock("vuetify-message-vue3", () => ({
+  useMessage: () => ({
+    error: messageErrorMock,
+  }),
 }));
 
 const voicesFixture: Voice[] = [
@@ -57,7 +64,8 @@ const buttonStub = defineComponent({
     },
   },
   emits: ["click"],
-  template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+  template:
+    '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
 });
 
 const selectStub = defineComponent({
@@ -105,7 +113,8 @@ describe("TextToSpeech view", () => {
       error: null,
     });
 
-    const { default: TextToSpeech } = await import("../../views/TextToSpeech.vue");
+    const { default: TextToSpeech } =
+      await import("../../views/TextToSpeech.vue");
     const wrapper = mount(TextToSpeech, {
       global: {
         plugins: [pinia],
@@ -129,7 +138,6 @@ describe("TextToSpeech view", () => {
           VSlider: sliderStub,
           VSelect: selectStub,
           VSheet: passthroughStub,
-          VAlert: passthroughStub,
         },
       },
     });
@@ -154,7 +162,8 @@ describe("TextToSpeech view", () => {
     const pinia = createPinia();
     setActivePinia(pinia);
 
-    const { default: TextToSpeech } = await import("../../views/TextToSpeech.vue");
+    const { default: TextToSpeech } =
+      await import("../../views/TextToSpeech.vue");
     const wrapper = mount(TextToSpeech, {
       global: {
         plugins: [pinia],
@@ -178,7 +187,6 @@ describe("TextToSpeech view", () => {
           VSlider: sliderStub,
           VSelect: selectStub,
           VSheet: passthroughStub,
-          VAlert: passthroughStub,
         },
       },
     });
@@ -193,9 +201,8 @@ describe("TextToSpeech view", () => {
     expect(wrapper.find(".tts-workspace__player").exists()).toBe(true);
     expect(wrapper.find(".options-panel.glass-panel").exists()).toBe(true);
     expect(wrapper.text()).toContain("Aero Glass Studio");
-    expect(wrapper.text()).toContain("Create speech with layered voice controls");
     expect(wrapper.text()).toContain(
-      "Shape voice, pacing, volume, and output format.",
+      "Create speech with layered voice controls",
     );
     expect(rawTextToSpeechView).not.toContain("calc(100vh");
   });
