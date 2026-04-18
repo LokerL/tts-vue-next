@@ -1,13 +1,18 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, test } from "vitest";
-import { mount } from "@vue/test-utils";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { flushPromises, mount } from "@vue/test-utils";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
+import i18n from "../../plugins/i18n";
 
 const passthroughStub = defineComponent({
-  template: '<div><slot /></div>',
+  template: "<div><slot /></div>",
+});
+
+const iconStub = defineComponent({
+  template: '<span class="icon-stub"><slot /></span>',
 });
 
 const listItemStub = defineComponent({
@@ -57,11 +62,12 @@ async function mountLayout(path = "/") {
   const { default: AppLayout } = await import("./AppLayout.vue");
   const wrapper = mount(AppLayout, {
     global: {
-      plugins: [router, pinia],
+      plugins: [router, pinia, i18n],
       stubs: {
         VNavigationDrawer: passthroughStub,
         VList: passthroughStub,
         VListItem: listItemStub,
+        VIcon: iconStub,
         VMain: passthroughStub,
       },
     },
@@ -71,14 +77,28 @@ async function mountLayout(path = "/") {
 }
 
 describe("AppLayout", () => {
-  test("renders the branded sidebar shell", async () => {
-    const { wrapper } = await mountLayout();
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    expect(wrapper.text()).toContain("TTS Vue Next");
-    expect(wrapper.text()).toContain("Desktop voice workspace");
-    expect(wrapper.text()).toContain("Text to Speech");
+  test("renders navigation items and version footer", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ tag_name: "v0.1.0" }),
+    } as Response);
+
+    const { wrapper } = await mountLayout();
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("TTS");
     expect(wrapper.text()).toContain("Batch Convert");
     expect(wrapper.text()).toContain("Settings");
+    expect(wrapper.get('[data-testid="sidebar-version"]').text()).toContain(
+      "Version v0.1.0",
+    );
+    expect(
+      wrapper.find('[data-testid="sidebar-version-update-icon"]').exists(),
+    ).toBe(false);
     expect(wrapper.find(".app-shell").exists()).toBe(true);
     expect(wrapper.find(".app-main-shell").exists()).toBe(true);
   });
@@ -103,5 +123,22 @@ describe("AppLayout", () => {
     expect(source.default).not.toContain("calc(100vh");
     expect(source.default).toContain("min-height: 100vh");
     expect(source.default).toContain("display: grid");
+  });
+
+  test("shows warning style and update icon when a newer release exists", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ tag_name: "v0.2.0" }),
+    } as Response);
+
+    const { wrapper } = await mountLayout();
+    await flushPromises();
+
+    const version = wrapper.get('[data-testid="sidebar-version"]');
+    expect(version.classes()).toContain("app-sidebar__footer--update");
+    expect(version.text()).toContain("Version v0.1.0 → v0.2.0");
+    expect(
+      wrapper.find('[data-testid="sidebar-version-update-icon"]').exists(),
+    ).toBe(true);
   });
 });

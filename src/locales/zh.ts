@@ -12,8 +12,12 @@ export default {
     textToSpeech: "文本转换",
     batchConvert: "批量转换",
     settings: "设置",
+    versionCurrent: "版本 {version}",
+    versionUpdateAvailable: "版本 {current} → {latest}",
   },
   titleBar: {
+    openRepository: "打开 GitHub 仓库",
+    openRepositoryFailed: "打开仓库失败，请重试。",
     toggleTheme: "切换主题",
     minimize: "最小化窗口",
     toggleMaximize: "切换最大化窗口",

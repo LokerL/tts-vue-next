@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { useTheme } from "vuetify";
 import { useI18n } from "vue-i18n";
 import { useSettingsStore } from "../../stores/settings";
+import { GITHUB_REPO_URL } from "../../constants/project";
 
 const theme = useTheme();
 const settingsStore = useSettingsStore();
@@ -37,6 +39,15 @@ async function toggleMaximize() {
     await appWindow.toggleMaximize();
     await syncMaximizedState();
   });
+}
+
+async function openRepository() {
+  try {
+    windowActionError.value = "";
+    await openUrl(GITHUB_REPO_URL);
+  } catch {
+    windowActionError.value = t("titleBar.openRepositoryFailed");
+  }
 }
 
 function toggleTheme() {
@@ -83,6 +94,14 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <v-spacer />
+    <v-btn
+      icon
+      size="small"
+      variant="text"
+      :aria-label="$t('titleBar.openRepository')"
+      @click="openRepository">
+      <v-icon size="18">mdi-github</v-icon>
+    </v-btn>
     <v-btn
       icon
       size="small"

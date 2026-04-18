@@ -12,8 +12,12 @@ export default {
     textToSpeech: "TTS",
     batchConvert: "Batch Convert",
     settings: "Settings",
+    versionCurrent: "Version {version}",
+    versionUpdateAvailable: "Version {current} → {latest}",
   },
   titleBar: {
+    openRepository: "Open GitHub repository",
+    openRepositoryFailed: "Failed to open repository. Please try again.",
     toggleTheme: "Toggle theme",
     minimize: "Minimize window",
     toggleMaximize: "Toggle maximize window",

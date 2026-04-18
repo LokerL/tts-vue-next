@@ -4,12 +4,14 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
+import i18n from "../../plugins/i18n";
 
 const {
   closeMock,
   getCurrentWindowMock,
   isMaximizedMock,
   minimizeMock,
+  openUrlMock,
   onResizedMock,
   toggleMaximizeMock,
   unlistenMock,
@@ -18,6 +20,7 @@ const {
   getCurrentWindowMock: vi.fn(),
   isMaximizedMock: vi.fn(),
   minimizeMock: vi.fn(),
+  openUrlMock: vi.fn(),
   onResizedMock: vi.fn(),
   toggleMaximizeMock: vi.fn(),
   unlistenMock: vi.fn(),
@@ -25,6 +28,10 @@ const {
 
 vi.mock("@tauri-apps/api/window", () => ({
   getCurrentWindow: getCurrentWindowMock,
+}));
+
+vi.mock("@tauri-apps/plugin-opener", () => ({
+  openUrl: openUrlMock,
 }));
 
 vi.mock("vuetify", () => {
@@ -55,7 +62,7 @@ const buttonStub = defineComponent({
   },
   emits: ["click"],
   template:
-    '<button :aria-label="ariaLabel || $attrs[\'aria-label\']" @click="$emit(\'click\')"><slot /></button>',
+    "<button :aria-label=\"ariaLabel || $attrs['aria-label']\" @click=\"$emit('click')\"><slot /></button>",
 });
 
 const iconStub = defineComponent({
@@ -63,7 +70,7 @@ const iconStub = defineComponent({
 });
 
 const passthroughStub = defineComponent({
-  template: '<div><slot /></div>',
+  template: "<div><slot /></div>",
 });
 
 function createDeferred<T>() {
@@ -88,7 +95,7 @@ async function mountTitleBar(errorHandler?: (error: unknown) => void) {
   return mount(TitleBar, {
     global: {
       config: errorHandler ? { errorHandler } : {},
-      plugins: [pinia],
+      plugins: [pinia, i18n],
       stubs: {
         VAppBar: passthroughStub,
         VBtn: buttonStub,
@@ -105,6 +112,7 @@ describe("TitleBar", () => {
     getCurrentWindowMock.mockReset();
     isMaximizedMock.mockReset();
     minimizeMock.mockReset();
+    openUrlMock.mockReset();
     onResizedMock.mockReset();
     toggleMaximizeMock.mockReset();
     unlistenMock.mockReset();
@@ -113,6 +121,7 @@ describe("TitleBar", () => {
     isMaximizedMock.mockResolvedValue(false);
     onResizedMock.mockResolvedValue(unlistenMock);
     minimizeMock.mockResolvedValue(undefined);
+    openUrlMock.mockResolvedValue(undefined);
     toggleMaximizeMock.mockResolvedValue(undefined);
     closeMock.mockResolvedValue(undefined);
   });
@@ -189,29 +198,46 @@ describe("TitleBar", () => {
     expect(wrapper.find('[role="alert"]').exists()).toBe(false);
 
     const buttons = wrapper.findAll("button");
-    await buttons[1].trigger("click");
-    await flushPromises();
     await buttons[2].trigger("click");
     await flushPromises();
     await buttons[3].trigger("click");
+    await flushPromises();
+    await buttons[4].trigger("click");
     await flushPromises();
 
     window.removeEventListener("unhandledrejection", captureUnhandledRejection);
 
     expect(unhandledRejections).toHaveLength(0);
-    expect(wrapper.get('[role="alert"]').text()).toBe("Window action failed. Please try again.");
+    expect(wrapper.get('[role="alert"]').text()).toBe(
+      "Window action failed. Please try again.",
+    );
   });
 
   test("exposes accessible labels on icon-only controls", async () => {
     const wrapper = await mountTitleBar();
 
-    const labels = wrapper.findAll("button").map((button) => button.attributes("aria-label"));
+    const labels = wrapper
+      .findAll("button")
+      .map((button) => button.attributes("aria-label"));
 
     expect(labels).toEqual([
+      "Open GitHub repository",
       "Toggle theme",
       "Minimize window",
       "Toggle maximize window",
       "Close window",
     ]);
+  });
+
+  test("opens repository from the GitHub button", async () => {
+    const wrapper = await mountTitleBar();
+    const buttons = wrapper.findAll("button");
+
+    await buttons[0].trigger("click");
+    await flushPromises();
+
+    expect(openUrlMock).toHaveBeenCalledWith(
+      "https://github.com/LokerL/tts-vue-next",
+    );
   });
 });
