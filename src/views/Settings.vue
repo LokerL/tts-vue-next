@@ -1,17 +1,20 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { useI18n } from "vue-i18n";
 import { useMessage } from "vuetify-message-vue3";
 import { useSettingsStore } from "../stores/settings";
 
 const settingsStore = useSettingsStore();
 const message = useMessage();
+const { t } = useI18n();
 
-const formatOptions = [
-  { title: "MP3", value: "mp3" },
-  { title: "WAV", value: "wav" },
-  { title: "OGG", value: "ogg" },
-  { title: "FLAC", value: "flac" },
-];
+const formatOptions = computed(() => [
+  { title: t("common.formats.mp3"), value: "mp3" },
+  { title: t("common.formats.wav"), value: "wav" },
+  { title: t("common.formats.ogg"), value: "ogg" },
+  { title: t("common.formats.flac"), value: "flac" },
+]);
 
 const retryOptions = Array.from({ length: 10 }, (_, index) => ({
   title: String(index + 1),
@@ -39,33 +42,36 @@ async function selectSavePath() {
   <v-container fluid class="settings-view pa-4 pa-md-6">
     <section class="settings-view__hero mb-4 mb-md-6">
       <div>
-        <div class="text-overline text-primary mb-2">Preferences</div>
-        <h1 class="text-h4 mb-2">Tune output and processing behavior</h1>
+        <div class="text-overline text-primary mb-2">
+          {{ $t("settings.hero.overline") }}
+        </div>
+        <h1 class="text-h4 mb-2">{{ $t("settings.hero.title") }}</h1>
         <p class="text-body-1 text-medium-emphasis mb-0">
-          Choose where converted audio is saved and how aggressively batch jobs
-          should run.
+          {{ $t("settings.hero.description") }}
         </p>
       </div>
     </section>
 
     <v-card class="mb-4" variant="outlined">
-      <v-card-title class="text-subtitle-1">Output</v-card-title>
+      <v-card-title class="text-subtitle-1">{{
+        $t("settings.sections.output")
+      }}</v-card-title>
       <v-card-text>
         <v-text-field
           :model-value="settingsStore.savePath"
-          label="Save Path"
+          :label="$t('settings.fields.savePath')"
           readonly
           append-inner-icon="mdi-folder-outline"
-          placeholder="Click to select..."
+          :placeholder="$t('settings.fields.savePathPlaceholder')"
           @click="selectSavePath" />
         <v-select
           :model-value="settingsStore.outputFormat"
           :items="formatOptions"
-          label="Default Format"
+          :label="$t('settings.fields.defaultFormat')"
           @update:model-value="settingsStore.updateOutputFormat" />
         <v-switch
           :model-value="settingsStore.autoplay"
-          label="Auto-play after conversion"
+          :label="$t('settings.fields.autoplay')"
           color="primary"
           hide-details
           @update:model-value="
@@ -75,28 +81,33 @@ async function selectSavePath() {
     </v-card>
 
     <v-card class="mb-4" variant="outlined">
-      <v-card-title class="text-subtitle-1">Processing</v-card-title>
+      <v-card-title class="text-subtitle-1">{{
+        $t("settings.sections.processing")
+      }}</v-card-title>
       <v-card-text>
         <v-select
           :model-value="settingsStore.maxRetries"
           :items="retryOptions"
-          label="Max Retries"
+          :label="$t('settings.fields.maxRetries')"
           @update:model-value="settingsStore.updateMaxRetries" />
         <v-select
           :model-value="settingsStore.fileConcurrency"
           :items="concurrencyOptions"
-          label="File Concurrency"
+          :label="$t('settings.fields.fileConcurrency')"
           @update:model-value="settingsStore.updateFileConcurrency" />
       </v-card-text>
     </v-card>
 
     <v-card variant="outlined">
-      <v-card-title class="text-subtitle-1">About</v-card-title>
+      <v-card-title class="text-subtitle-1">{{
+        $t("settings.sections.about")
+      }}</v-card-title>
       <v-card-text>
-        <div class="text-body-2 mb-2"><strong>TTS Vue Next</strong> v0.1.0</div>
+        <div class="text-body-2 mb-2">
+          <strong>{{ $t("common.appName") }}</strong> v0.1.0
+        </div>
         <div class="text-caption text-medium-emphasis">
-          A desktop TTS application powered by Microsoft Edge TTS service and
-          built with Vue 3, Vuetify, and Tauri.
+          {{ $t("settings.about.description") }}
         </div>
       </v-card-text>
     </v-card>

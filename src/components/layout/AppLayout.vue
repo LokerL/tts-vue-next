@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
+const { t } = useI18n();
 
-const navItems = [
-  { title: "文本转换", icon: "mdi-star", to: "/" },
-  { title: "批量转换", icon: "mdi-file-multiple", to: "/batch" },
-  { title: "设置", icon: "mdi-cog", to: "/settings" },
-];
+const navItems = computed(() => [
+  { title: t("nav.textToSpeech"), icon: "mdi-star", to: "/" },
+  { title: t("nav.batchConvert"), icon: "mdi-file-multiple", to: "/batch" },
+  { title: t("nav.settings"), icon: "mdi-cog", to: "/settings" },
+]);
 </script>
 
 <template>

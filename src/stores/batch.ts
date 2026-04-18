@@ -1,3 +1,4 @@
+import i18n from "../plugins/i18n";
 import { defineStore } from "pinia";
 import { invoke } from "@tauri-apps/api/core";
 import type { BatchFile, OutputFormat, TtsParams } from "../types";
@@ -76,7 +77,10 @@ async function removeTempFile(path: string | null): Promise<string | null> {
     await invoke("remove_file", { path });
     return null;
   } catch (error) {
-    return `Failed to remove temporary file ${path}: ${toErrorMessage(error)}`;
+    return i18n.global.t("batch.errors.failedToRemoveTempFile", {
+      path,
+      message: toErrorMessage(error),
+    });
   }
 }
 

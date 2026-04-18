@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useMessage } from "vuetify-message-vue3";
 import { useSettingsStore } from "../../stores/settings";
 import { useTtsStore } from "../../stores/tts";
@@ -7,6 +8,7 @@ import { useTtsStore } from "../../stores/tts";
 const ttsStore = useTtsStore();
 const settingsStore = useSettingsStore();
 const message = useMessage();
+const { t } = useI18n();
 
 const audioRef = ref<HTMLAudioElement | null>(null);
 const isPlaying = ref(false);
@@ -102,8 +104,8 @@ async function saveAudio() {
     const { remove, writeFile } = await import("@tauri-apps/plugin-fs");
     const ext = settingsStore.outputFormat;
     const filePath = await save({
-      defaultPath: `tts-output.${ext}`,
-      filters: [{ name: "Audio", extensions: [ext] }],
+      defaultPath: t("tts.audioPlayer.defaultFileName", { ext }),
+      filters: [{ name: t("tts.audioPlayer.saveFilterName"), extensions: [ext] }],
     });
 
     if (!filePath) {
@@ -207,13 +209,13 @@ onUnmounted(() => {
 
     <div class="audio-player__inner">
       <div class="audio-player__label text-caption font-weight-medium">
-        Playback Console
+        {{ $t("tts.audioPlayer.title") }}
       </div>
 
       <v-btn
         icon
         variant="text"
-        aria-label="Toggle playback"
+        :aria-label="$t('tts.audioPlayer.togglePlayback')"
         :disabled="!ttsStore.audioUrl"
         @click="togglePlay">
         <v-icon>{{ isPlaying ? "mdi-pause" : "mdi-play" }}</v-icon>
@@ -248,7 +250,7 @@ onUnmounted(() => {
       <v-btn
         icon
         variant="text"
-        aria-label="Save generated audio"
+        :aria-label="$t('tts.audioPlayer.saveGeneratedAudio')"
         :disabled="!ttsStore.audioBytes"
         @click="saveAudio">
         <v-icon>mdi-content-save</v-icon>

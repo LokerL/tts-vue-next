@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useMessage } from "vuetify-message-vue3";
 import type { OutputFormat } from "../../types";
 import { useSettingsStore } from "../../stores/settings";
@@ -9,13 +10,14 @@ import VoiceSelector from "./VoiceSelector.vue";
 const ttsStore = useTtsStore();
 const settingsStore = useSettingsStore();
 const message = useMessage();
+const { t } = useI18n();
 
-const formatOptions: Array<{ title: string; value: OutputFormat }> = [
-  { title: "MP3", value: "mp3" },
-  { title: "WAV", value: "wav" },
-  { title: "OGG", value: "ogg" },
-  { title: "FLAC", value: "flac" },
-];
+const formatOptions = computed((): Array<{ title: string; value: OutputFormat }> => [
+  { title: t("common.formats.mp3"), value: "mp3" },
+  { title: t("common.formats.wav"), value: "wav" },
+  { title: t("common.formats.ogg"), value: "ogg" },
+  { title: t("common.formats.flac"), value: "flac" },
+]);
 
 const rate = computed({
   get: () => ttsStore.rate,
@@ -70,7 +72,7 @@ async function convertText() {
           <v-icon>mdi-tune-variant</v-icon>
         </v-avatar>
       </template>
-      <v-card-title class="text-h6">Voice Control Dock</v-card-title>
+      <v-card-title class="text-h6">{{ $t("tts.options.title") }}</v-card-title>
     </v-card-item>
 
     <v-card-text class="pt-2">
@@ -80,7 +82,7 @@ async function convertText() {
 
       <div class="slider-group">
         <div class="d-flex align-center justify-space-between mb-2">
-          <span class="text-body-2">Rate</span>
+          <span class="text-body-2">{{ $t("tts.options.rate") }}</span>
           <span class="text-caption text-medium-emphasis">{{
             ttsStore.rateString
           }}</span>
@@ -97,7 +99,7 @@ async function convertText() {
 
       <div class="slider-group">
         <div class="d-flex align-center justify-space-between mb-2">
-          <span class="text-body-2">Pitch</span>
+          <span class="text-body-2">{{ $t("tts.options.pitch") }}</span>
           <span class="text-caption text-medium-emphasis">{{
             ttsStore.pitchString
           }}</span>
@@ -114,7 +116,7 @@ async function convertText() {
 
       <div class="slider-group">
         <div class="d-flex align-center justify-space-between mb-2">
-          <span class="text-body-2">Volume</span>
+          <span class="text-body-2">{{ $t("tts.options.volume") }}</span>
           <span class="text-caption text-medium-emphasis">{{
             ttsStore.volumeString
           }}</span>
@@ -134,7 +136,7 @@ async function convertText() {
       <v-select
         v-model="outputFormat"
         :items="formatOptions"
-        label="Output Format"
+        :label="$t('tts.options.outputFormat')"
         prepend-inner-icon="mdi-file-music-outline" />
     </v-card-text>
 
@@ -147,7 +149,11 @@ async function convertText() {
         :disabled="!ttsStore.text.trim()"
         prepend-icon="mdi-play"
         @click="convertText">
-        {{ ttsStore.converting ? "Generating..." : "Generate Speech" }}
+        {{
+          ttsStore.converting
+            ? $t("tts.options.generating")
+            : $t("tts.options.generate")
+        }}
       </v-btn>
 
       <v-btn
@@ -157,7 +163,7 @@ async function convertText() {
         color="error"
         prepend-icon="mdi-stop"
         @click="ttsStore.stop()">
-        Stop
+        {{ $t("tts.options.stop") }}
       </v-btn>
     </v-card-actions>
   </v-card>

@@ -19,12 +19,12 @@ const hasText = computed(() => ttsStore.text.length > 0);
           <v-icon>mdi-text-box-outline</v-icon>
         </v-avatar>
       </template>
-      <v-card-title class="text-h6">{{ $t("Header.index") }}</v-card-title>
+      <v-card-title class="text-h6">{{ $t("tts.textInput.title") }}</v-card-title>
     </v-card-item>
     <v-card-text class="text-panel__body">
       <v-textarea
         v-model="text"
-        placeholder="Enter text to convert to speech..."
+        :placeholder="$t('tts.textInput.placeholder')"
         variant="outlined"
         flat
         no-resize

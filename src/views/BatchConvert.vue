@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useBatchStore } from "../stores/batch";
 import { useSettingsStore } from "../stores/settings";
 import FileList from "../components/batch/FileList.vue";
@@ -6,10 +8,17 @@ import FileUpload from "../components/batch/FileUpload.vue";
 
 const batchStore = useBatchStore();
 const settingsStore = useSettingsStore();
+const { t } = useI18n();
 
 const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
   title: String(value),
   value,
+}));
+
+const actionLabels = computed(() => ({
+  startAll: t("batch.actions.startAll"),
+  clear: t("batch.actions.clear"),
+  concurrency: t("batch.actions.concurrency"),
 }));
 </script>
 
@@ -17,13 +26,14 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
   <v-container fluid class="page-shell batch-page">
     <section class="batch-page__hero section-hero glass-panel">
       <div>
-        <div class="text-overline text-primary mb-2">Batch Workflow Studio</div>
+        <div class="text-overline text-primary mb-2">
+          {{ $t("batch.hero.overline") }}
+        </div>
         <h1 class="text-h4 mb-2">
-          Convert document queues with clear progress controls
+          {{ $t("batch.hero.title") }}
         </h1>
         <p class="text-body-1 text-medium-emphasis mb-0">
-          Queue text files, review progress per item, and export audio with
-          controlled concurrency.
+          {{ $t("batch.hero.description") }}
         </p>
       </div>
     </section>
@@ -47,7 +57,7 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
                 :disabled="batchStore.files.length === 0"
                 prepend-icon="mdi-play"
                 @click="batchStore.convertAll()">
-                Start All
+                {{ actionLabels.startAll }}
               </v-btn>
               <v-btn
                 variant="outlined"
@@ -55,7 +65,7 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
                   batchStore.converting || batchStore.files.length === 0
                 "
                 @click="batchStore.clearFiles()">
-                Clear
+                {{ actionLabels.clear }}
               </v-btn>
             </div>
 
@@ -63,7 +73,7 @@ const concurrencyItems = [1, 2, 3, 4, 5].map((value) => ({
               <v-select
                 :model-value="settingsStore.fileConcurrency"
                 :items="concurrencyItems"
-                label="Concurrency"
+                :label="actionLabels.concurrency"
                 style="width: 136px"
                 hide-details
                 @update:model-value="settingsStore.updateFileConcurrency" />

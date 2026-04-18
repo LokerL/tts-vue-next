@@ -2,15 +2,16 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTheme } from "vuetify";
+import { useI18n } from "vue-i18n";
 import { useSettingsStore } from "../../stores/settings";
 
 const theme = useTheme();
 const settingsStore = useSettingsStore();
+const { t } = useI18n();
 const isMaximized = ref(false);
 const windowActionError = ref("");
 
 const appWindow = getCurrentWindow();
-const windowActionErrorMessage = "Window action failed. Please try again.";
 let removeResizeListener: (() => void) | null = null;
 let disposed = false;
 
@@ -27,7 +28,7 @@ async function runWindowAction(action: () => Promise<void>) {
     windowActionError.value = "";
     await action();
   } catch {
-    windowActionError.value = windowActionErrorMessage;
+    windowActionError.value = t("titleBar.windowActionFailed");
   }
 }
 
@@ -78,7 +79,7 @@ onBeforeUnmount(() => {
     data-tauri-drag-region>
     <div class="drag-region">
       <div class="app-title-wrap">
-        <span class="app-title">TTS Vue Next</span>
+        <span class="app-title">{{ $t("common.appName") }}</span>
       </div>
     </div>
     <v-spacer />
@@ -86,7 +87,7 @@ onBeforeUnmount(() => {
       icon
       size="small"
       variant="text"
-      aria-label="Toggle theme"
+      :aria-label="$t('titleBar.toggleTheme')"
       @click="toggleTheme">
       <v-icon size="18">
         {{
@@ -100,7 +101,7 @@ onBeforeUnmount(() => {
       icon
       size="small"
       variant="text"
-      aria-label="Minimize window"
+      :aria-label="$t('titleBar.minimize')"
       @click="runWindowAction(() => appWindow.minimize())">
       <v-icon size="18">mdi-minus</v-icon>
     </v-btn>
@@ -108,7 +109,7 @@ onBeforeUnmount(() => {
       icon
       size="small"
       variant="text"
-      aria-label="Toggle maximize window"
+      :aria-label="$t('titleBar.toggleMaximize')"
       @click="toggleMaximize">
       <v-icon size="18">
         {{ isMaximized ? "mdi-window-restore" : "mdi-window-maximize" }}
@@ -119,7 +120,7 @@ onBeforeUnmount(() => {
       size="small"
       variant="text"
       class="close-btn"
-      aria-label="Close window"
+      :aria-label="$t('titleBar.close')"
       @click="runWindowAction(() => appWindow.close())">
       <v-icon size="18">mdi-close</v-icon>
     </v-btn>

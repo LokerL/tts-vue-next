@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
+import { useI18n } from "vue-i18n";
 import { useMessage } from "vuetify-message-vue3";
 import { useBatchStore } from "../../stores/batch";
 
@@ -8,6 +9,7 @@ const SUPPORTED_EXTENSIONS = new Set(["txt", "md", "markdown", "docx"]);
 
 const batchStore = useBatchStore();
 const message = useMessage();
+const { t } = useI18n();
 const isDragOver = ref(false);
 const fileError = ref<string | null>(null);
 
@@ -27,7 +29,11 @@ function setUnsupportedFilesError(paths: string[]) {
   const unsupportedPaths = paths.filter((path) => !isSupportedPath(path));
   fileError.value =
     unsupportedPaths.length > 0
-      ? `Unsupported file types: ${unsupportedPaths.map((path) => path.split(/[\\/]/).pop() || path).join(", ")}`
+      ? t("batch.upload.unsupportedFileTypes", {
+          files: unsupportedPaths
+            .map((path) => path.split(/[\\/]/).pop() || path)
+            .join(", "),
+        })
       : null;
 
   if (fileError.value) {
@@ -74,7 +80,7 @@ async function openFilePicker() {
       multiple: true,
       filters: [
         {
-          name: "Text Files",
+          name: t("batch.upload.filePickerFilterName"),
           extensions: ["txt", "md", "markdown", "docx"],
         },
       ],
@@ -130,17 +136,16 @@ function onDrop(event: DragEvent) {
       <v-avatar size="56" color="primary" variant="tonal" class="mb-4">
         <v-icon size="28">mdi-file-upload-outline</v-icon>
       </v-avatar>
-      <div class="text-h6 mb-2">Drop text files into the queue</div>
+      <div class="text-h6 mb-2">{{ $t("batch.upload.title") }}</div>
       <div class="text-body-2 text-medium-emphasis mb-4">
-        Click to browse, or drop `.txt`, `.md`, `.markdown`, and `.docx` files
-        here.
+        {{ $t("batch.upload.description") }}
       </div>
       <v-btn
         color="primary"
         prepend-icon="mdi-folder-open-outline"
-        :disabled="isDisabled"
-        >Choose Files</v-btn
-      >
+        :disabled="isDisabled">
+        {{ $t("batch.upload.chooseFiles") }}
+      </v-btn>
     </v-card>
   </div>
 </template>

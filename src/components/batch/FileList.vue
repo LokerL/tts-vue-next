@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { watch } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { useI18n } from "vue-i18n";
 import { useMessage } from "vuetify-message-vue3";
 import { useBatchStore } from "../../stores/batch";
 
 const batchStore = useBatchStore();
 const message = useMessage();
+const { t } = useI18n();
 
 watch(
   () =>
@@ -45,13 +47,13 @@ function statusColor(status: string): string {
 function statusLabel(status: string): string {
   switch (status) {
     case "done":
-      return "Completed";
+      return t("batch.list.status.completed");
     case "error":
-      return "Failed";
+      return t("batch.list.status.failed");
     case "processing":
-      return "Processing";
+      return t("batch.list.status.processing");
     default:
-      return "Queued";
+      return t("batch.list.status.queued");
   }
 }
 
@@ -67,17 +69,17 @@ async function showInFolder(path: string) {
 <template>
   <v-card variant="outlined" class="file-list glass-panel">
     <div class="file-list__header pa-4 pb-2">
-      <div class="text-h6">Queue Progress</div>
+      <div class="text-h6">{{ $t("batch.list.title") }}</div>
     </div>
 
     <template v-if="batchStore.files.length > 0">
       <v-table density="comfortable" class="file-list-table">
         <thead>
           <tr>
-            <th>File</th>
-            <th>Status</th>
-            <th style="width: 220px">Progress</th>
-            <th style="width: 148px">Actions</th>
+            <th>{{ $t("batch.list.columns.file") }}</th>
+            <th>{{ $t("batch.list.columns.status") }}</th>
+            <th style="width: 220px">{{ $t("batch.list.columns.progress") }}</th>
+            <th style="width: 148px">{{ $t("batch.list.columns.actions") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -140,9 +142,9 @@ async function showInFolder(path: string) {
 
     <div v-else class="pa-8 text-center text-medium-emphasis">
       <v-icon size="28" class="mb-3">mdi-file-document-outline</v-icon>
-      <div class="text-body-1 mb-1">No files queued yet</div>
+      <div class="text-body-1 mb-1">{{ $t("batch.list.emptyTitle") }}</div>
       <div class="text-caption">
-        Your selected files will appear here before conversion starts.
+        {{ $t("batch.list.emptyDescription") }}
       </div>
     </div>
   </v-card>

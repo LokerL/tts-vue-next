@@ -43,7 +43,7 @@ const voiceItems = computed(() =>
     <v-select
       v-model="selectedLocale"
       :items="localeItems"
-      label="Language"
+      :label="$t('tts.options.language')"
       :loading="voicesStore.loading"
       prepend-inner-icon="mdi-translate"
       class="mb-3" />
@@ -51,7 +51,7 @@ const voiceItems = computed(() =>
     <v-select
       v-model="selectedVoice"
       :items="voiceItems"
-      label="Voice"
+      :label="$t('tts.options.voice')"
       :loading="voicesStore.loading"
       prepend-inner-icon="mdi-account-voice" />
   </div>
