@@ -9,7 +9,7 @@ export default {
     },
   },
   nav: {
-    textToSpeech: "Text to Speech",
+    textToSpeech: "TTS",
     batchConvert: "Batch Convert",
     settings: "Settings",
   },
@@ -48,8 +48,9 @@ export default {
   batch: {
     hero: {
       overline: "Batch Workflow Studio",
-      title: "Convert document queues with clear progress controls",
-      description: "Queue text files, review progress per item, and export audio with controlled concurrency.",
+      title: "Batch Workflow Studio",
+      description:
+        "Queue text files, review progress per item, and export audio with controlled concurrency.",
     },
     actions: {
       startAll: "Start All",
@@ -58,7 +59,8 @@ export default {
     },
     upload: {
       title: "Drop text files into the queue",
-      description: "Click to browse, or drop `.txt`, `.md`, `.markdown`, and `.docx` files here.",
+      description:
+        "Click to browse, or drop `.txt`, `.md`, `.markdown`, and `.docx` files here.",
       chooseFiles: "Choose Files",
       unsupportedFileTypes: "Unsupported file types: {files}",
       filePickerFilterName: "Text Files",
@@ -72,7 +74,8 @@ export default {
         actions: "Actions",
       },
       emptyTitle: "No files queued yet",
-      emptyDescription: "Your selected files will appear here before conversion starts.",
+      emptyDescription:
+        "You can drag and drop files here, or click the button above to select files.",
       status: {
         completed: "Completed",
         failed: "Failed",
@@ -81,14 +84,16 @@ export default {
       },
     },
     errors: {
-      failedToRemoveTempFile: "Failed to remove temporary file {path}: {message}",
+      failedToRemoveTempFile:
+        "Failed to remove temporary file {path}: {message}",
     },
   },
   settings: {
     hero: {
       overline: "Preferences",
       title: "Tune output and processing behavior",
-      description: "Choose where converted audio is saved and how aggressively batch jobs should run.",
+      description:
+        "Choose where converted audio is saved and how aggressively batch jobs should run.",
     },
     sections: {
       output: "Output",
@@ -99,12 +104,18 @@ export default {
       savePath: "Save Path",
       savePathPlaceholder: "Click to select...",
       defaultFormat: "Default Format",
+      displayLanguage: "Display Language",
       autoplay: "Auto-play after conversion",
       maxRetries: "Max Retries",
       fileConcurrency: "File Concurrency",
     },
+    languages: {
+      zh: "Simplified Chinese",
+      en: "English",
+    },
     about: {
-      description: "A desktop TTS application powered by Microsoft Edge TTS service and built with Vue 3, Vuetify, and Tauri.",
+      description:
+        "A desktop TTS application powered by Microsoft Edge TTS service and built with Vue 3, Vuetify, and Tauri.",
     },
   },
 } as const;

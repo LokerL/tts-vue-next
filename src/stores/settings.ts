@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import type { OutputFormat, ThemeMode, TtsSettings } from "../types";
+import type {
+  AppLanguage,
+  OutputFormat,
+  ThemeMode,
+  TtsSettings,
+} from "../types";
 
 const MIN_RETRIES = 1;
 const MAX_RETRIES = 10;
@@ -64,6 +69,9 @@ export const useSettingsStore = defineStore("settings", {
     },
     updateAutoplay(autoplay: boolean) {
       this.$patch({ autoplay });
+    },
+    updateLanguage(language: AppLanguage) {
+      this.$patch({ language });
     },
     updateThemeMode(themeMode: ThemeMode) {
       this.$patch({ themeMode });

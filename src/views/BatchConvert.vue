@@ -24,24 +24,24 @@ const actionLabels = computed(() => ({
 
 <template>
   <v-container fluid class="page-shell batch-page">
-    <section class="batch-page__hero section-hero glass-panel">
-      <div>
-        <div class="text-overline text-primary mb-2">
-          {{ $t("batch.hero.overline") }}
-        </div>
-        <h1 class="text-h4 mb-2">
-          {{ $t("batch.hero.title") }}
-        </h1>
-        <p class="text-body-1 text-medium-emphasis mb-0">
-          {{ $t("batch.hero.description") }}
-        </p>
-      </div>
-    </section>
-
     <section class="batch-workspace">
-      <div class="batch-workspace__upload">
-        <FileUpload />
-      </div>
+      <v-card flat class="batch-workspace__title glass-panel">
+        <v-card-item>
+          <template #prepend>
+            <v-avatar color="primary" variant="tonal" size="36">
+              <v-icon>mdi-file-multiple-outline</v-icon>
+            </v-avatar>
+          </template>
+
+          <v-card-title class="text-h6">
+            {{ $t("batch.hero.title") }}
+          </v-card-title>
+
+          <template #append>
+            <FileUpload />
+          </template>
+        </v-card-item>
+      </v-card>
 
       <div class="batch-workspace__list">
         <FileList />
@@ -49,8 +49,8 @@ const actionLabels = computed(() => ({
 
       <div class="batch-workspace__actions">
         <v-card variant="outlined" class="batch-actions glass-panel">
-          <div class="batch-actions__row pa-4">
-            <div class="d-flex align-center ga-2 flex-wrap">
+          <div class="batch-actions__row pa-3">
+            <div class="batch-actions__buttons d-flex align-center ga-2">
               <v-btn
                 color="primary"
                 :loading="batchStore.converting"
@@ -61,9 +61,7 @@ const actionLabels = computed(() => ({
               </v-btn>
               <v-btn
                 variant="outlined"
-                :disabled="
-                  batchStore.converting || batchStore.files.length === 0
-                "
+                :disabled="batchStore.converting || batchStore.files.length === 0"
                 @click="batchStore.clearFiles()">
                 {{ actionLabels.clear }}
               </v-btn>
@@ -74,6 +72,7 @@ const actionLabels = computed(() => ({
                 :model-value="settingsStore.fileConcurrency"
                 :items="concurrencyItems"
                 :label="actionLabels.concurrency"
+                density="compact"
                 style="width: 136px"
                 hide-details
                 @update:model-value="settingsStore.updateFileConcurrency" />
@@ -87,11 +86,13 @@ const actionLabels = computed(() => ({
 
 <style scoped>
 .batch-page {
-  min-height: 100%;
-  padding: 24px;
+  height: 100%;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
   background:
     radial-gradient(
-      circle at top left,
+      circle at top right,
       rgba(var(--v-theme-primary), 0.08),
       transparent 22%
     ),
@@ -102,45 +103,74 @@ const actionLabels = computed(() => ({
     );
 }
 
-.batch-page__hero {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 24px;
+.batch-workspace {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.batch-workspace {
-  display: grid;
-  gap: 16px;
+.batch-workspace__title {
+  flex: 0 0 auto;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(var(--v-theme-primary), 0.1),
+      transparent 30%
+    ),
+    rgba(var(--v-theme-surface), 0.78);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 60px rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.batch-workspace__title :deep(.v-card-item) {
+  min-height: 64px;
+  padding: 10px 16px;
+}
+
+.batch-workspace__list {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.batch-workspace__actions {
+  flex: 0 0 72px;
+  height: 72px;
 }
 
 .batch-actions {
+  height: 100%;
   border-color: rgba(var(--v-border-color), var(--v-border-opacity));
   background: rgba(var(--v-theme-surface), 0.88);
   backdrop-filter: blur(14px);
 }
 
 .batch-actions__row {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
+}
+
+.batch-actions__buttons {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.batch-actions__buttons::-webkit-scrollbar {
+  display: none;
 }
 
 .batch-actions__settings {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
   gap: 12px;
-}
-
-@media (max-width: 960px) {
-  .batch-actions__row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .batch-actions__settings {
-    justify-content: flex-start;
-  }
 }
 </style>

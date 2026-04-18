@@ -48,7 +48,7 @@ export default {
   batch: {
     hero: {
       overline: "批量转换工作台",
-      title: "用清晰的进度控制批量转换文档队列",
+      title: "批量转换",
       description: "将文本文件加入队列，逐项查看进度，并以可控并发导出音频。",
     },
     actions: {
@@ -58,7 +58,8 @@ export default {
     },
     upload: {
       title: "将文本文件拖入队列",
-      description: "点击浏览，或将 `.txt`、`.md`、`.markdown` 和 `.docx` 文件拖放到这里。",
+      description:
+        "点击浏览，或将 `.txt`、`.md`、`.markdown` 和 `.docx` 文件拖放到这里。",
       chooseFiles: "选择文件",
       unsupportedFileTypes: "不支持的文件类型：{files}",
       filePickerFilterName: "文本文件",
@@ -72,7 +73,7 @@ export default {
         actions: "操作",
       },
       emptyTitle: "还没有排队的文件",
-      emptyDescription: "你选择的文件会在开始转换前显示在这里。",
+      emptyDescription: "可以直接将文件拖放到这里，或点击上方按钮选择文件。",
       status: {
         completed: "已完成",
         failed: "失败",
@@ -99,12 +100,18 @@ export default {
       savePath: "保存路径",
       savePathPlaceholder: "点击选择...",
       defaultFormat: "默认格式",
+      displayLanguage: "显示语言",
       autoplay: "转换后自动播放",
       maxRetries: "最大重试次数",
       fileConcurrency: "文件并发数",
     },
+    languages: {
+      zh: "简体中文",
+      en: "English",
+    },
     about: {
-      description: "一个由 Microsoft Edge TTS 服务驱动，并基于 Vue 3、Vuetify 和 Tauri 构建的桌面 TTS 应用。",
+      description:
+        "一个由 Microsoft Edge TTS 服务驱动，并基于 Vue 3、Vuetify 和 Tauri 构建的桌面 TTS 应用。",
     },
   },
 } as const;
