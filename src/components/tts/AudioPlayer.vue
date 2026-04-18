@@ -101,7 +101,7 @@ async function saveAudio() {
 
   try {
     const { save } = await import("@tauri-apps/plugin-dialog");
-    const { remove, writeFile } = await import("@tauri-apps/plugin-fs");
+    const { invoke } = await import("@tauri-apps/api/core");
     const ext = settingsStore.outputFormat;
     const filePath = await save({
       defaultPath: t("tts.audioPlayer.defaultFileName", { ext }),
@@ -112,18 +112,25 @@ async function saveAudio() {
       return;
     }
 
+    const audioData = Array.from(ttsStore.audioBytes);
+
     if (ext === "mp3") {
-      await writeFile(filePath, ttsStore.audioBytes);
+      await invoke("write_binary_file", {
+        path: filePath,
+        data: audioData,
+      });
       return;
     }
 
     const tempPath = `${filePath}.tmp.mp3`;
-    const { invoke } = await import("@tauri-apps/api/core");
     let saveError: unknown = null;
     let shouldRemoveTempFile = false;
 
     try {
-      await writeFile(tempPath, ttsStore.audioBytes);
+      await invoke("write_binary_file", {
+        path: tempPath,
+        data: audioData,
+      });
       shouldRemoveTempFile = true;
       await invoke("convert_audio_format", {
         inputPath: tempPath,
@@ -135,7 +142,9 @@ async function saveAudio() {
     } finally {
       if (shouldRemoveTempFile) {
         try {
-          await remove(tempPath);
+          await invoke("remove_file", {
+            path: tempPath,
+          });
         } catch (cleanupError) {
           if (!saveError) {
             saveError = cleanupError;

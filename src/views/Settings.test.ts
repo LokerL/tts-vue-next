@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
+import i18n from "../plugins/i18n";
 import { useSettingsStore } from "../stores/settings";
 
 const { invokeMock, messageErrorMock } = vi.hoisted(() => ({
@@ -22,7 +23,8 @@ vi.mock("vuetify-message-vue3", () => ({
 }));
 
 const passthroughStub = defineComponent({
-  template: "<div><slot /></div>",
+  inheritAttrs: false,
+  template: '<div v-bind="$attrs"><slot /></div>',
 });
 
 const textFieldStub = defineComponent({
@@ -47,12 +49,33 @@ const textFieldStub = defineComponent({
 
 const selectStub = defineComponent({
   props: {
+    items: {
+      type: Array,
+      default: () => [],
+    },
     label: {
       type: String,
       default: "",
     },
+    modelValue: {
+      type: [String, Number],
+      default: "",
+    },
   },
-  template: '<div class="select-stub">{{ label }}</div>',
+  emits: ["update:modelValue"],
+  template: `
+    <label>
+      <span>{{ label }}</span>
+      <select
+        class="select-stub"
+        :data-label="label"
+        :value="modelValue"
+        @change="$emit('update:modelValue', Number($event.target.value))"
+      >
+        <option v-for="item in items" :key="item.value" :value="item.value">{{ item.title }}</option>
+      </select>
+    </label>
+  `,
 });
 
 const switchStub = defineComponent({
@@ -64,6 +87,30 @@ const switchStub = defineComponent({
   },
   template: '<div class="switch-stub">{{ label }}</div>',
 });
+
+async function mountSettings() {
+  const pinia = createPinia();
+  setActivePinia(pinia);
+
+  const { default: Settings } = await import("./Settings.vue");
+  return mount(Settings, {
+    global: {
+      plugins: [pinia, i18n],
+      stubs: {
+        VContainer: passthroughStub,
+        VCard: passthroughStub,
+        VCardItem: passthroughStub,
+        VCardTitle: passthroughStub,
+        VCardText: passthroughStub,
+        VAvatar: passthroughStub,
+        VIcon: passthroughStub,
+        VTextField: textFieldStub,
+        VSelect: selectStub,
+        VSwitch: switchStub,
+      },
+    },
+  });
+}
 
 describe("Settings view", () => {
   beforeEach(() => {
@@ -78,24 +125,7 @@ describe("Settings view", () => {
   });
 
   test("opens the folder picker only once when append icon is clicked", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
-
-    const { default: Settings } = await import("./Settings.vue");
-    const wrapper = mount(Settings, {
-      global: {
-        plugins: [pinia],
-        stubs: {
-          VContainer: passthroughStub,
-          VCard: passthroughStub,
-          VCardTitle: passthroughStub,
-          VCardText: passthroughStub,
-          VTextField: textFieldStub,
-          VSelect: selectStub,
-          VSwitch: switchStub,
-        },
-      },
-    });
+    const wrapper = await mountSettings();
 
     await wrapper.find(".text-field-append-stub").trigger("click");
     await flushPromises();
@@ -104,37 +134,30 @@ describe("Settings view", () => {
     expect(invokeMock).toHaveBeenCalledWith("select_folder");
   });
 
-  test("renders settings sections and updates save path from folder picker", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
-
-    const { default: Settings } = await import("./Settings.vue");
-    const wrapper = mount(Settings, {
-      global: {
-        plugins: [pinia],
-        stubs: {
-          VContainer: passthroughStub,
-          VCard: passthroughStub,
-          VCardTitle: passthroughStub,
-          VCardText: passthroughStub,
-          VTextField: textFieldStub,
-          VSelect: selectStub,
-          VSwitch: switchStub,
-        },
-      },
-    });
+  test("renders processing controls including chunk concurrency and updates save path", async () => {
+    const wrapper = await mountSettings();
 
     expect(wrapper.text()).toContain("Output");
     expect(wrapper.text()).toContain("Processing");
-    expect(wrapper.text()).toContain("About");
     expect(wrapper.text()).toContain("Default Format");
+    expect(wrapper.text()).toContain("Display Language");
     expect(wrapper.text()).toContain("Auto-play after conversion");
-    expect(wrapper.text()).not.toContain("Chunk Concurrency");
+    expect(wrapper.text()).toContain("Max Retries");
+    expect(wrapper.text()).toContain("File Concurrency");
+    expect(wrapper.text()).toContain("Chunk Concurrency");
+
+    const settingsStore = useSettingsStore();
+    const chunkConcurrencySelect = wrapper
+      .findAll(".select-stub")
+      .find((select) => select.attributes("data-label") === "Chunk Concurrency");
+
+    expect(chunkConcurrencySelect).toBeDefined();
+    await chunkConcurrencySelect!.setValue("5");
+    expect(settingsStore.chunkConcurrency).toBe(5);
 
     await wrapper.find(".text-field-stub").trigger("click");
     await flushPromises();
 
-    const settingsStore = useSettingsStore();
     expect(invokeMock).toHaveBeenCalledWith("select_folder");
     expect(settingsStore.savePath).toBe("C:/exports");
   });

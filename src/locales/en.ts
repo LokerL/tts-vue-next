@@ -52,6 +52,9 @@ export default {
       description:
         "Queue text files, review progress per item, and export audio with controlled concurrency.",
     },
+    options: {
+      title: "Batch Control Panel",
+    },
     actions: {
       startAll: "Start All",
       clear: "Clear",
@@ -75,7 +78,7 @@ export default {
       },
       emptyTitle: "No files queued yet",
       emptyDescription:
-        "You can drag and drop files here, or click the button above to select files.",
+        "You can drag and drop files here, or use the button below to select files.",
       status: {
         completed: "Completed",
         failed: "Failed",
@@ -108,6 +111,7 @@ export default {
       autoplay: "Auto-play after conversion",
       maxRetries: "Max Retries",
       fileConcurrency: "File Concurrency",
+      chunkConcurrency: "Chunk Concurrency",
     },
     languages: {
       zh: "Simplified Chinese",

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "ffmpeg:sync": "node sync-ffmpeg-sidecar.mjs",
+    "postinstall": "pnpm ffmpeg:sync",
+    "tauri": "pnpm ffmpeg:sync && tauri"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -24,6 +26,7 @@
     "vuetify-message-vue3": "^1.1.2"
   },
   "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@tauri-apps/cli": "^2",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",

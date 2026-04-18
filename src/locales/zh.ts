@@ -51,6 +51,9 @@ export default {
       title: "批量转换",
       description: "将文本文件加入队列，逐项查看进度，并以可控并发导出音频。",
     },
+    options: {
+      title: "批量控制面板",
+    },
     actions: {
       startAll: "全部开始",
       clear: "清空",
@@ -73,7 +76,7 @@ export default {
         actions: "操作",
       },
       emptyTitle: "还没有排队的文件",
-      emptyDescription: "可以直接将文件拖放到这里，或点击上方按钮选择文件。",
+      emptyDescription: "可以直接将文件拖放到这里，或使用下方按钮选择文件。",
       status: {
         completed: "已完成",
         failed: "失败",
@@ -104,6 +107,7 @@ export default {
       autoplay: "转换后自动播放",
       maxRetries: "最大重试次数",
       fileConcurrency: "文件并发数",
+      chunkConcurrency: "分段并发数",
     },
     languages: {
       zh: "简体中文",

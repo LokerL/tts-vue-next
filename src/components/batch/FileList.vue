@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useI18n } from "vue-i18n";
 import { useMessage } from "vuetify-message-vue3";
+import FileUpload from "./FileUpload.vue";
 import { useBatchStore } from "../../stores/batch";
 
 const SUPPORTED_EXTENSIONS = new Set(["txt", "md", "markdown", "docx"]);
@@ -70,7 +71,12 @@ function isPointerInsideFileList(x: number, y: number): boolean {
   const cssX = x / scale;
   const cssY = y / scale;
 
-  return cssX >= bounds.left && cssX <= bounds.right && cssY >= bounds.top && cssY <= bounds.bottom;
+  return (
+    cssX >= bounds.left &&
+    cssX <= bounds.right &&
+    cssY >= bounds.top &&
+    cssY <= bounds.bottom
+  );
 }
 
 function addDroppedFiles(paths: string[]) {
@@ -108,7 +114,10 @@ onMounted(async () => {
     switch (payload.type) {
       case "enter":
       case "over":
-        isDragOver.value = isPointerInsideFileList(payload.position.x, payload.position.y);
+        isDragOver.value = isPointerInsideFileList(
+          payload.position.x,
+          payload.position.y,
+        );
         break;
       case "drop":
         isDragOver.value = false;
@@ -182,9 +191,18 @@ async function showInFolder(path: string) {
         'file-list--disabled': isDisabled,
       }"
       :aria-disabled="isDisabled">
-      <div class="file-list__header pa-4 pb-2">
+      <template #prepend>
+        <v-avatar color="primary" variant="tonal" size="36">
+          <v-icon>mdi-tune-variant</v-icon>
+        </v-avatar>
+        <v-card-title class="text-h6 ml-2">{{
+          $t("batch.list.title")
+        }}</v-card-title>
+      </template>
+
+      <!-- <div class="file-list__header pa-4 pb-2">
         <div class="text-h6">{{ $t("batch.list.title") }}</div>
-      </div>
+      </div> -->
 
       <div class="file-list__body">
         <template v-if="batchStore.files.length > 0">
@@ -196,13 +214,17 @@ async function showInFolder(path: string) {
                 <th style="width: 220px">
                   {{ $t("batch.list.columns.progress") }}
                 </th>
-                <th style="width: 148px">{{ $t("batch.list.columns.actions") }}</th>
+                <th style="width: 148px">
+                  {{ $t("batch.list.columns.actions") }}
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="file in batchStore.files" :key="file.id">
                 <td>
-                  <div class="text-body-2 font-weight-medium">{{ file.name }}</div>
+                  <div class="text-body-2 font-weight-medium">
+                    {{ file.name }}
+                  </div>
                   <div class="text-caption text-medium-emphasis">
                     {{ file.path }}
                   </div>
@@ -244,7 +266,9 @@ async function showInFolder(path: string) {
                       icon
                       size="x-small"
                       variant="text"
-                      :disabled="batchStore.converting && file.status === 'processing'"
+                      :disabled="
+                        batchStore.converting && file.status === 'processing'
+                      "
                       @click="batchStore.removeFile(file.id)">
                       <v-icon size="small">mdi-close</v-icon>
                     </v-btn>
@@ -258,9 +282,10 @@ async function showInFolder(path: string) {
         <div v-else class="file-list__empty text-center text-medium-emphasis">
           <v-icon size="28" class="mb-3">mdi-file-document-outline</v-icon>
           <div class="text-body-1 mb-1">{{ $t("batch.list.emptyTitle") }}</div>
-          <div class="text-caption">
+          <div class="text-caption mb-4">
             {{ $t("batch.list.emptyDescription") }}
           </div>
+          <FileUpload />
         </div>
       </div>
     </v-card>

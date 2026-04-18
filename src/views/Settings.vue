@@ -128,6 +128,13 @@ async function selectSavePath() {
                   density="comfortable"
                   :label="$t('settings.fields.fileConcurrency')"
                   @update:model-value="settingsStore.updateFileConcurrency" />
+
+                <v-select
+                  :model-value="settingsStore.chunkConcurrency"
+                  :items="concurrencyOptions"
+                  density="comfortable"
+                  :label="$t('settings.fields.chunkConcurrency')"
+                  @update:model-value="settingsStore.updateChunkConcurrency" />
               </div>
             </section>
           </div>

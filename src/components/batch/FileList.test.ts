@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
+import i18n from "../../plugins/i18n";
 import { useBatchStore } from "../../stores/batch";
 
 const { invokeMock, messageErrorMock } = vi.hoisted(() => ({
@@ -13,6 +14,12 @@ const { invokeMock, messageErrorMock } = vi.hoisted(() => ({
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: invokeMock,
+}));
+
+vi.mock("@tauri-apps/api/window", () => ({
+  getCurrentWindow: () => ({
+    onDragDropEvent: vi.fn().mockResolvedValue(vi.fn()),
+  }),
 }));
 
 vi.mock("vuetify-message-vue3", () => ({
@@ -52,6 +59,10 @@ const progressStub = defineComponent({
   template: '<div class="progress-stub" />',
 });
 
+const fileUploadStub = defineComponent({
+  template: '<div data-test="file-upload-stub" />',
+});
+
 describe("FileList", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -62,8 +73,11 @@ describe("FileList", () => {
   async function mountFileList() {
     const { default: FileList } = await import("./FileList.vue");
 
+    i18n.global.locale.value = "en";
+
     return mount(FileList, {
       global: {
+        plugins: [i18n],
         stubs: {
           VCard: cardStub,
           VTable: tableStub,
@@ -71,10 +85,18 @@ describe("FileList", () => {
           VIcon: iconStub,
           VChip: chipStub,
           VProgressLinear: progressStub,
+          FileUpload: fileUploadStub,
         },
       },
     });
   }
+
+  test("renders the upload entry in the empty state", async () => {
+    const wrapper = await mountFileList();
+
+    expect(wrapper.text()).toContain("No files queued yet");
+    expect(wrapper.find('[data-test="file-upload-stub"]').exists()).toBe(true);
+  });
 
   test("shows toast when show-in-folder fails", async () => {
     const batchStore = useBatchStore();
@@ -94,7 +116,13 @@ describe("FileList", () => {
     invokeMock.mockRejectedValue(new Error("open folder failed"));
 
     const wrapper = await mountFileList();
-    await wrapper.find("button").trigger("click");
+    const showInFolderButton = wrapper
+      .findAll("button")
+      .find((button) => button.text().includes("mdi-folder-open-outline"));
+
+    expect(showInFolderButton).toBeDefined();
+
+    await showInFolderButton?.trigger("click");
     await flushPromises();
 
     expect(messageErrorMock).toHaveBeenCalledWith("open folder failed");

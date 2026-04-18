@@ -70,6 +70,7 @@ describe("useSettingsStore", () => {
     store.updateSavePath("/persisted/output");
     store.updateOutputFormat("flac");
     store.updateMaxRetries(7);
+    store.updateChunkConcurrency(4);
     store.updateThemeMode("dark");
 
     const nextPinia = createPinia();
@@ -82,6 +83,7 @@ describe("useSettingsStore", () => {
     expect(rehydratedStore.savePath).toBe("/persisted/output");
     expect(rehydratedStore.outputFormat).toBe("flac");
     expect(rehydratedStore.maxRetries).toBe(7);
+    expect(rehydratedStore.chunkConcurrency).toBe(4);
     expect(rehydratedStore.themeMode).toBe("dark");
   });
 

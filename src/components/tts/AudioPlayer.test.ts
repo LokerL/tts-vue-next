@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { defineComponent } from "vue";
+import i18n from "../../plugins/i18n";
 import { useSettingsStore } from "../../stores/settings";
 import { useTtsStore } from "../../stores/tts";
 
@@ -56,6 +57,23 @@ const sliderStub = defineComponent({
   template: "<div><slot /></div>",
 });
 
+async function mountAudioPlayer() {
+  i18n.global.locale.value = "en";
+
+  const { default: AudioPlayer } = await import("./AudioPlayer.vue");
+  return mount(AudioPlayer, {
+    global: {
+      plugins: [i18n],
+      stubs: {
+        VCard: passthroughStub,
+        VBtn: buttonStub,
+        VIcon: passthroughStub,
+        VSlider: sliderStub,
+      },
+    },
+  });
+}
+
 describe("AudioPlayer", () => {
   beforeEach(() => {
     const pinia = createPinia();
@@ -64,6 +82,7 @@ describe("AudioPlayer", () => {
     writeFileMock.mockReset();
     removeMock.mockReset();
     invokeMock.mockReset();
+    messageErrorMock.mockReset();
 
     const settingsStore = useSettingsStore();
     settingsStore.$reset();
@@ -77,17 +96,7 @@ describe("AudioPlayer", () => {
   });
 
   test("renders the Aero Glass playback console with labeled icon controls", async () => {
-    const { default: AudioPlayer } = await import("./AudioPlayer.vue");
-    const wrapper = mount(AudioPlayer, {
-      global: {
-        stubs: {
-          VCard: passthroughStub,
-          VBtn: buttonStub,
-          VIcon: passthroughStub,
-          VSlider: sliderStub,
-        },
-      },
-    });
+    const wrapper = await mountAudioPlayer();
 
     expect(wrapper.find(".audio-player.glass-panel").exists()).toBe(true);
     expect(wrapper.text()).toContain("Playback Console");
@@ -95,22 +104,31 @@ describe("AudioPlayer", () => {
     expect(wrapper.find('button[aria-label="Save generated audio"]').exists()).toBe(true);
   });
 
+  test("saves MP3 audio through backend file command instead of frontend fs plugin", async () => {
+    const settingsStore = useSettingsStore();
+    settingsStore.updateOutputFormat("mp3");
+    saveMock.mockResolvedValue("/tmp/output.mp3");
+
+    const wrapper = await mountAudioPlayer();
+
+    const buttons = wrapper.findAll("button");
+    await buttons[1].trigger("click");
+    await flushPromises();
+
+    expect(invokeMock).toHaveBeenCalledWith("write_binary_file", {
+      path: "/tmp/output.mp3",
+      data: [1, 2, 3],
+    });
+    expect(writeFileMock).not.toHaveBeenCalled();
+  });
+
   test("preserves the original save error when temp file cleanup also fails", async () => {
     saveMock.mockResolvedValue("/tmp/output.wav");
-    writeFileMock.mockRejectedValue(new Error("write failed"));
-    removeMock.mockRejectedValue(new Error("cleanup failed"));
+    invokeMock
+      .mockRejectedValueOnce(new Error("write failed"))
+      .mockRejectedValueOnce(new Error("cleanup failed"));
 
-    const { default: AudioPlayer } = await import("./AudioPlayer.vue");
-    const wrapper = mount(AudioPlayer, {
-      global: {
-        stubs: {
-          VCard: passthroughStub,
-          VBtn: buttonStub,
-          VIcon: passthroughStub,
-          VSlider: sliderStub,
-        },
-      },
-    });
+    const wrapper = await mountAudioPlayer();
 
     const buttons = wrapper.findAll("button");
     await buttons[1].trigger("click");
@@ -118,26 +136,17 @@ describe("AudioPlayer", () => {
 
     const ttsStore = useTtsStore();
     expect(ttsStore.error).toContain("write failed");
-    expect(removeMock).not.toHaveBeenCalled();
+    expect(messageErrorMock).toHaveBeenCalledWith(expect.stringContaining("write failed"));
   });
 
   test("preserves the conversion error when temp file cleanup also fails", async () => {
     saveMock.mockResolvedValue("/tmp/output.wav");
-    writeFileMock.mockResolvedValue(undefined);
-    invokeMock.mockRejectedValue(new Error("convert failed"));
-    removeMock.mockRejectedValue(new Error("cleanup failed"));
+    invokeMock
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("convert failed"))
+      .mockRejectedValueOnce(new Error("cleanup failed"));
 
-    const { default: AudioPlayer } = await import("./AudioPlayer.vue");
-    const wrapper = mount(AudioPlayer, {
-      global: {
-        stubs: {
-          VCard: passthroughStub,
-          VBtn: buttonStub,
-          VIcon: passthroughStub,
-          VSlider: sliderStub,
-        },
-      },
-    });
+    const wrapper = await mountAudioPlayer();
 
     const buttons = wrapper.findAll("button");
     await buttons[1].trigger("click");
@@ -145,6 +154,8 @@ describe("AudioPlayer", () => {
 
     const ttsStore = useTtsStore();
     expect(ttsStore.error).toContain("convert failed");
-    expect(removeMock).toHaveBeenCalledWith("/tmp/output.wav.tmp.mp3");
+    expect(invokeMock).toHaveBeenLastCalledWith("remove_file", {
+      path: "/tmp/output.wav.tmp.mp3",
+    });
   });
 });
