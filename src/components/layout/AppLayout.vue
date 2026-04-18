@@ -82,6 +82,7 @@ const navItems = [
 
 .app-main {
   height: 100%;
+  width: calc(100vw - 150px);
   overflow-y: auto;
 }
 </style>

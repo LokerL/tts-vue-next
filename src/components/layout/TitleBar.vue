@@ -131,13 +131,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .title-bar {
-  -webkit-app-region: no-drag;
   user-select: none;
-
   border: 1px solid rgba(var(--v-theme-glass-border), 0.42);
   background: rgba(var(--v-theme-glass), 0.58) !important;
   backdrop-filter: blur(18px);
   -webkit-app-region: drag;
+}
+
+.title-bar .v-btn {
+  -webkit-app-region: no-drag;
 }
 
 .drag-region {

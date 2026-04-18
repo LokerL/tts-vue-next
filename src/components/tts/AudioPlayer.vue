@@ -262,7 +262,6 @@ onUnmounted(() => {
   position: sticky;
   bottom: 0;
   z-index: 2;
-  margin-top: 16px;
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background: rgba(var(--v-theme-surface), 0.92);
   backdrop-filter: blur(16px);

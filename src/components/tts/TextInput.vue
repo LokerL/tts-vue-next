@@ -28,9 +28,9 @@ const hasText = computed(() => ttsStore.text.length > 0);
         class="text-panel__field" />
     </v-card-text>
 
-    <v-divider />
+    <!-- <v-divider /> -->
 
-    <v-card-actions class="px-4 py-3">
+    <!-- <v-card-actions class="px-4 py-3">
       <div class="d-flex align-center ga-2 flex-wrap">
         <v-chip size="small" variant="tonal" color="primary">
           {{ ttsStore.charCount }} chars
@@ -48,12 +48,13 @@ const hasText = computed(() => ttsStore.text.length > 0);
         @click="ttsStore.clear()">
         Clear
       </v-btn>
-    </v-card-actions>
+    </v-card-actions> -->
   </v-card>
 </template>
 
 <style scoped>
 .text-panel {
+  height: 100%;
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background:
     radial-gradient(
@@ -69,7 +70,8 @@ const hasText = computed(() => ttsStore.text.length > 0);
 .text-panel__body {
   flex: 1;
   display: flex;
-  min-height: 0;
+  height: 100%;
+  padding: 5px;
 }
 
 .text-panel__field {

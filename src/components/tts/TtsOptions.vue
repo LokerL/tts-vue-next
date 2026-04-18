@@ -138,8 +138,6 @@ async function convertText() {
         prepend-inner-icon="mdi-file-music-outline" />
     </v-card-text>
 
-    <v-spacer />
-
     <v-card-actions class="px-4 pb-4 pt-0 d-flex flex-column ga-3">
       <v-btn
         block
@@ -167,6 +165,7 @@ async function convertText() {
 
 <style scoped>
 .options-panel {
+  height: 100%;
   border-color: rgba(var(--v-border-color), var(--v-border-opacity));
   background:
     radial-gradient(

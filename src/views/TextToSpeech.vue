@@ -7,12 +7,14 @@ import TtsOptions from "../components/tts/TtsOptions.vue";
 <template>
   <v-container fluid class="tts-page">
     <section class="tts-workspace">
-      <div class="tts-workspace__input">
-        <TextInput />
-      </div>
+      <div class="tts-workspace__input-control">
+        <div class="tts-workspace__input">
+          <TextInput />
+        </div>
 
-      <div class="tts-workspace__control">
-        <TtsOptions />
+        <div class="tts-workspace__control">
+          <TtsOptions />
+        </div>
       </div>
 
       <div class="tts-workspace__player">
@@ -25,7 +27,7 @@ import TtsOptions from "../components/tts/TtsOptions.vue";
 <style scoped>
 .tts-page {
   padding: 10px;
-  min-height: 100%;
+  height: 100%;
   background:
     radial-gradient(
       circle at top right,
@@ -40,13 +42,28 @@ import TtsOptions from "../components/tts/TtsOptions.vue";
 }
 
 .tts-workspace {
-  display: grid;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
   gap: 10px;
 }
 
-.tts-workspace__player {
-  grid-column: 1 / -1;
+.tts-workspace__input-control {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tts-workspace__input {
+  flex: 1;
+  flex-grow: 1;
+}
+.tts-workspace__control {
+  height: 100%;
+  width: 300px;
 }
 
 @media (max-width: 1280px) {
