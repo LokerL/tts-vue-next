@@ -19,7 +19,9 @@ const hasText = computed(() => ttsStore.text.length > 0);
           <v-icon>mdi-text-box-outline</v-icon>
         </v-avatar>
       </template>
-      <v-card-title class="text-h6">{{ $t("tts.textInput.title") }}</v-card-title>
+      <v-card-title class="text-h6">{{
+        $t("tts.textInput.title")
+      }}</v-card-title>
     </v-card-item>
     <v-card-text class="text-panel__body">
       <v-textarea
@@ -58,6 +60,8 @@ const hasText = computed(() => ttsStore.text.length > 0);
     rgba(var(--v-theme-surface), 0.78);
   backdrop-filter: blur(18px);
   box-shadow: 0 18px 60px rgba(var(--v-theme-on-surface), 0.08);
+  display: flex;
+  flex-direction: column;
 }
 
 .text-panel__body {
