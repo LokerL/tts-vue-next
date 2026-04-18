@@ -3,10 +3,10 @@ name: Build
 on:
   push:
     branches:
-      - '**'
+      - "**"
   pull_request:
     branches:
-      - '**'
+      - "**"
 
 permissions:
   contents: read
@@ -21,8 +21,6 @@ jobs:
             target: x86_64-pc-windows-msvc
           - platform: macos-latest
             target: aarch64-apple-darwin
-          - platform: macos-latest
-            target: x86_64-apple-darwin
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
 
@@ -67,7 +65,16 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Build Tauri app
+      - name: Build Tauri app (Windows NSIS only)
+        if: matrix.platform == 'windows-latest'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }} --bundles nsis
+
+      - name: Build Tauri app (non-Windows)
+        if: matrix.platform != 'windows-latest'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

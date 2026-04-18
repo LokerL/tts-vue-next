@@ -9,7 +9,14 @@
     "preview": "vite preview",
     "ffmpeg:sync": "node sync-ffmpeg-sidecar.mjs",
     "postinstall": "pnpm ffmpeg:sync",
-    "tauri": "pnpm ffmpeg:sync && tauri"
+    "tauri": "pnpm ffmpeg:sync && tauri",
+    "tauri:dev": "pnpm ffmpeg:sync && tauri dev",
+    "tauri:build": "pnpm ffmpeg:sync && tauri build",
+    "tauri:build:win": "pnpm ffmpeg:sync && tauri build --target x86_64-pc-windows-msvc",
+    "tauri:build:mac": "pnpm ffmpeg:sync && tauri build --target universal-apple-darwin",
+    "tauri:build:mac:intel": "pnpm ffmpeg:sync && tauri build --target x86_64-apple-darwin",
+    "tauri:build:mac:arm": "pnpm ffmpeg:sync && tauri build --target aarch64-apple-darwin",
+    "tauri:build:linux": "pnpm ffmpeg:sync && tauri build --target x86_64-unknown-linux-gnu"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
