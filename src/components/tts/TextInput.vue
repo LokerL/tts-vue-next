@@ -8,14 +8,19 @@ const text = computed({
   get: () => ttsStore.text,
   set: (value: string) => ttsStore.setText(value),
 });
-import { useMessage } from "vuetify-message-vue3";
-
-const message = useMessage();
 const hasText = computed(() => ttsStore.text.length > 0);
 </script>
 
 <template>
   <v-card flat class="text-panel glass-panel">
+    <v-card-item>
+      <template #prepend>
+        <v-avatar color="primary" variant="tonal" size="36">
+          <v-icon>mdi-text-box-outline</v-icon>
+        </v-avatar>
+      </template>
+      <v-card-title class="text-h6">{{ $t("Header.index") }}</v-card-title>
+    </v-card-item>
     <v-card-text class="text-panel__body">
       <v-textarea
         v-model="text"
@@ -26,29 +31,17 @@ const hasText = computed(() => ttsStore.text.length > 0);
         hide-details
         rows="18"
         class="text-panel__field" />
+
+      <v-fade-transition>
+        <v-icon
+          v-if="hasText"
+          icon="mdi-delete-outline"
+          size="small"
+          class="text-panel__clear-btn"
+          :disabled="ttsStore.converting"
+          @click="ttsStore.clear()" />
+      </v-fade-transition>
     </v-card-text>
-
-    <!-- <v-divider /> -->
-
-    <!-- <v-card-actions class="px-4 py-3">
-      <div class="d-flex align-center ga-2 flex-wrap">
-        <v-chip size="small" variant="tonal" color="primary">
-          {{ ttsStore.charCount }} chars
-        </v-chip>
-        <v-chip size="small" variant="tonal" color="secondary">
-          {{ ttsStore.byteCount }} bytes
-        </v-chip>
-      </div>
-      <v-spacer />
-      <v-btn
-        size="small"
-        variant="text"
-        prepend-icon="mdi-delete-outline"
-        :disabled="!hasText || ttsStore.converting"
-        @click="ttsStore.clear()">
-        Clear
-      </v-btn>
-    </v-card-actions> -->
   </v-card>
 </template>
 
@@ -72,6 +65,7 @@ const hasText = computed(() => ttsStore.text.length > 0);
   display: flex;
   height: 100%;
   padding: 5px;
+  position: relative;
 }
 
 .text-panel__field {
@@ -86,5 +80,27 @@ const hasText = computed(() => ttsStore.text.length > 0);
 
 .text-panel__field :deep(textarea) {
   min-height: 100% !important;
+}
+
+.text-panel__clear-btn {
+  position: absolute;
+  left: 95%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: rgba(var(--v-theme-on-surface), 0.45);
+
+  border-radius: 999px;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.text-panel__clear-btn:hover {
+  color: rgb(var(--v-theme-error));
+}
+
+.text-panel__clear-btn:disabled {
+  opacity: 0.55;
 }
 </style>

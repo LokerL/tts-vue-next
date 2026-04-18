@@ -1,6 +1,5 @@
 // @vitest-environment happy-dom
 
-import rawTextInput from "./TextInput.vue?raw";
 import { describe, expect, test } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
@@ -26,6 +25,7 @@ const textareaStub = defineComponent({
 });
 
 const buttonStub = defineComponent({
+  inheritAttrs: false,
   props: {
     disabled: {
       type: Boolean,
@@ -33,145 +33,79 @@ const buttonStub = defineComponent({
     },
   },
   emits: ["click"],
-  template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+  template:
+    '<button v-bind="$attrs" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
 });
 
-describe("TextInput", () => {
-  test("renders the Aero Glass script workspace and keeps text metrics", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
+const transitionStub = defineComponent({
+  template: "<div><slot /></div>",
+});
 
-    const store = useTtsStore();
-    store.$patch({
-      text: "Hello 世界",
-      converting: false,
-    });
+async function mountTextInput(initialText = "", converting = false) {
+  const pinia = createPinia();
+  setActivePinia(pinia);
 
-    const { default: TextInput } = await import("./TextInput.vue");
-    const wrapper = mount(TextInput, {
-      global: {
-        plugins: [pinia],
-        stubs: {
-          VCard: passthroughStub,
-          VCardItem: passthroughStub,
-          VAvatar: passthroughStub,
-          VIcon: passthroughStub,
-          VCardTitle: passthroughStub,
-          VCardSubtitle: passthroughStub,
-          VCardText: passthroughStub,
-          VTextarea: textareaStub,
-          VDivider: passthroughStub,
-          VCardActions: passthroughStub,
-          VChip: passthroughStub,
-          VSpacer: passthroughStub,
-          VBtn: buttonStub,
-        },
-      },
-    });
-
-    expect(wrapper.find(".text-panel.glass-panel").exists()).toBe(true);
-    expect(wrapper.text()).toContain("Script Workspace");
-    expect(wrapper.text()).toContain(
-      "Draft, paste, or refine the text you want to synthesize.",
-    );
-    expect(wrapper.text()).toContain("8 chars");
-    expect(wrapper.text()).toContain("12 bytes");
-    expect(rawTextInput).not.toContain('variant="solo-filled"');
+  const store = useTtsStore();
+  store.$patch({
+    text: initialText,
+    converting,
   });
 
-  test("updates the store through textarea input", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
-
-    const store = useTtsStore();
-    const { default: TextInput } = await import("./TextInput.vue");
-    const wrapper = mount(TextInput, {
-      global: {
-        plugins: [pinia],
-        stubs: {
-          VCard: passthroughStub,
-          VCardItem: passthroughStub,
-          VAvatar: passthroughStub,
-          VIcon: passthroughStub,
-          VCardTitle: passthroughStub,
-          VCardSubtitle: passthroughStub,
-          VCardText: passthroughStub,
-          VTextarea: textareaStub,
-          VDivider: passthroughStub,
-          VCardActions: passthroughStub,
-          VChip: passthroughStub,
-          VSpacer: passthroughStub,
-          VBtn: buttonStub,
-        },
+  const { default: TextInput } = await import("./TextInput.vue");
+  const wrapper = mount(TextInput, {
+    global: {
+      plugins: [pinia],
+      stubs: {
+        VCard: passthroughStub,
+        VCardText: passthroughStub,
+        VTextarea: textareaStub,
+        VBtn: buttonStub,
+        VFadeTransition: transitionStub,
       },
-    });
+    },
+  });
+
+  return { wrapper, store };
+}
+
+describe("TextInput", () => {
+  test("renders input panel and hides clear icon when text is empty", async () => {
+    const { wrapper } = await mountTextInput();
+
+    expect(wrapper.find(".text-panel.glass-panel").exists()).toBe(true);
+    expect(wrapper.find("textarea").exists()).toBe(true);
+    expect(wrapper.find('[aria-label="Clear text input"]').exists()).toBe(
+      false,
+    );
+  });
+
+  test("shows clear icon after input and updates store", async () => {
+    const { wrapper, store } = await mountTextInput();
 
     await wrapper.find("textarea").setValue("Fresh script");
 
     expect(store.text).toBe("Fresh script");
+    const clearButton = wrapper.find('[aria-label="Clear text input"]');
+    expect(clearButton.exists()).toBe(true);
+    expect(clearButton.attributes("icon")).toBe("mdi-delete-outline");
   });
 
-  test("disables Clear when text is empty", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
+  test("clears text when clear icon is clicked", async () => {
+    const { wrapper, store } = await mountTextInput("Need clear", false);
 
-    const { default: TextInput } = await import("./TextInput.vue");
-    const wrapper = mount(TextInput, {
-      global: {
-        plugins: [pinia],
-        stubs: {
-          VCard: passthroughStub,
-          VCardItem: passthroughStub,
-          VAvatar: passthroughStub,
-          VIcon: passthroughStub,
-          VCardTitle: passthroughStub,
-          VCardSubtitle: passthroughStub,
-          VCardText: passthroughStub,
-          VTextarea: textareaStub,
-          VDivider: passthroughStub,
-          VCardActions: passthroughStub,
-          VChip: passthroughStub,
-          VSpacer: passthroughStub,
-          VBtn: buttonStub,
-        },
-      },
-    });
+    await wrapper.find('[aria-label="Clear text input"]').trigger("click");
 
-    expect(wrapper.find("button").attributes("disabled")).toBeDefined();
+    expect(store.text).toBe("");
+    expect(wrapper.find('[aria-label="Clear text input"]').exists()).toBe(
+      false,
+    );
   });
 
-  test("disables Clear while a conversion is running", async () => {
-    const pinia = createPinia();
-    setActivePinia(pinia);
+  test("disables clear icon while a conversion is running", async () => {
+    const { wrapper } = await mountTextInput("hello", true);
 
-    const store = useTtsStore();
-    store.$patch({
-      text: "hello",
-      converting: true,
-    });
-
-    const { default: TextInput } = await import("./TextInput.vue");
-    const wrapper = mount(TextInput, {
-      global: {
-        plugins: [pinia],
-        stubs: {
-          VCard: passthroughStub,
-          VCardItem: passthroughStub,
-          VAvatar: passthroughStub,
-          VIcon: passthroughStub,
-          VCardTitle: passthroughStub,
-          VCardSubtitle: passthroughStub,
-          VCardText: passthroughStub,
-          VTextarea: textareaStub,
-          VDivider: passthroughStub,
-          VCardActions: passthroughStub,
-          VChip: passthroughStub,
-          VSpacer: passthroughStub,
-          VBtn: buttonStub,
-        },
-      },
-    });
-
-    expect(wrapper.find("button").attributes("disabled")).toBeDefined();
+    expect(
+      wrapper.find('[aria-label="Clear text input"]').attributes("disabled"),
+    ).toBeDefined();
   });
 });
