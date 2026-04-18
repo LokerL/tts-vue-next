@@ -73,15 +73,42 @@ jobs:
         with:
           args: --target ${{ matrix.target }} --bundles nsis
 
-      - name: Build Tauri app (non-Windows)
-        if: matrix.platform != 'windows-latest'
+      - name: Build Tauri app (macOS DMG only)
+        if: matrix.platform == 'macos-latest'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }} --bundles dmg
+
+      - name: Build Tauri app (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: --target ${{ matrix.target }}
 
-      - name: Upload artifacts
+      - name: Upload artifacts (Windows NSIS)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tts-vue-next-${{ matrix.target }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Upload artifacts (macOS DMG)
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tts-vue-next-${{ matrix.target }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+
+      - name: Upload artifacts (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
           name: tts-vue-next-${{ matrix.target }}
